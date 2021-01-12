@@ -1,0 +1,16 @@
+{
+  "name": "ElectronReto",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app/index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^8.5.5",
+    "mongoose": "^5.11.10"
+  }
+}
