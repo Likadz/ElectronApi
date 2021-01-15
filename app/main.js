@@ -43,7 +43,16 @@ ipcMain.on("create-usuario", async (e, arg) => {
 ipcMain.on("login", async (e, arg) => {
   const usuario = new Usuario (arg);//usuario recibido por el form
   //llamada a la api
-  const request = net.request('http://127.0.0.1:8080/usuarios/getByUsuario/'+usuario.nombre +'/'+usuario.contraseña+'/'+usuario.rol)
+  //const request = net.request('http://127.0.0.1:8080/usuarios/getLogin/'+usuario.nombre +'/'+usuario.contraseña+'/'+usuario.rol)
+  const request = net.request({ 
+    method: 'GET', 
+    protocol: 'http:', 
+    hostname: '127.0.0.1', 
+    port: 8080,
+    path: '/usuarios/getLogin/'+usuario.nombre +'/'+usuario.contraseña+'/'+usuario.rol,
+    
+  }); 
+
   request.on('response', (response) => {
     console.log(`STATUS: ${response.statusCode}`);
     response.on('error', (error) => {
@@ -103,7 +112,15 @@ ipcMain.on("login", async (e, arg) => {
 });
 
 ipcMain.on("get-rutas", async (e, arg) => {
-  const request = net.request('http://127.0.0.1:8080/rutas/leer')
+  //const request = net.request({method:'delete',path:'http://127.0.0.1:8080/rutas/getAll'})
+  const request = net.request({ 
+    method: 'GET', 
+    protocol: 'http:', 
+    hostname: '127.0.0.1', 
+    port: 8080,
+    path: '/rutas/getAll'
+    
+  }); 
   request.on('response', (response) => {
     //cogemos la data 
     response.on('data', (chunk) => {
@@ -119,12 +136,31 @@ ipcMain.on("get-rutas", async (e, arg) => {
 });
 
 ipcMain.on("delete-ruta", async (e, args) => {
-  const rutaDeleted = await Ruta.findByIdAndDelete(args);
-  e.reply("delete-ruta-success", JSON.stringify(rutaDeleted));
+  //const rutaDeleted = await Ruta.findByIdAndDelete(args);
+  console.log("delete " + args);
+  //const request = net.request('http://127.0.0.1:8080/rutas/deleteId/'+args)
+  const request = net.request({ 
+    method: 'DELETE', 
+    protocol: 'http:', 
+    hostname: '127.0.0.1', 
+    port: 8080,
+    path: 'rutas/deleteId/'+args
+    
+  }); 
+  request.on('response', (response) => {
+    //cogemos la data 
+    response.on('data', (chunk) => {
+     
+      
+    })
+  })
+  request.end()
+  BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
+
 });
 
 ipcMain.on("buscar", async (e, arg) => {
-  const request = net.request('http://127.0.0.1:8080/rutas/leer/ciudad/'+arg)
+  const request = net.request('http://127.0.0.1:8080/rutas/getCiudad/'+arg)
   request.on('response', (response) => {
     //cogemos la data 
     response.on('data', (chunk) => {
@@ -132,6 +168,7 @@ ipcMain.on("buscar", async (e, arg) => {
       for(let i = 0; i< JSON.parse(chunk).length; i++){
         rutas.push(new Ruta(JSON.parse(chunk)[i]));//por cada elemento de la data parseada creamos un usuario en el array
       }
+      
       e.reply("busqueda-realizada", JSON.stringify(rutas));//pasamos las rutas al app.js
     })
   })
@@ -141,6 +178,18 @@ ipcMain.on("buscar", async (e, arg) => {
 ipcMain.on("exit", async (e, arg) => {
   console.log("LOGOUT");
   BrowserWindow.getFocusedWindow().loadFile('app/html/index.html')//cambiamos el html de la ventana.
+});
+
+//ir al form de crear ruta
+ipcMain.on("create-ruta-form", async (e, arg) => {
+  console.log("vamos al form");
+  BrowserWindow.getFocusedWindow().loadFile('app/src/nuevo/index.html')//cambiamos el html de la ventana.
+});
+
+//ir al form de editar ruta
+ipcMain.on("edit-ruta-form", async (e, arg) => {
+  console.log("vamos al form edit");
+  BrowserWindow.getFocusedWindow().loadFile('app/src/editar/index.html')//cambiamos el html de la ventana.
 });
 
 module.exports = { createWindow };

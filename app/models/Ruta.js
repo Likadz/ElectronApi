@@ -1,11 +1,15 @@
-const { model , Schema} = require('mongoose')
+const { model , Schema, get} = require('mongoose')
 
 const newRutaSchema = new Schema({
+  id:{
+    type:String,
+    required: false
+  },
   nombre: {
     type: String,
     required: true
   },
-  description: {
+  descripcion: {
     type: String,
     required: true
   },
@@ -32,6 +36,10 @@ const newRutaSchema = new Schema({
   dificultad:{
     type:Number,
     required:true
+  },
+  listaLocalizaciones:{
+    type:Array,
+    required:false
   }
 })
 

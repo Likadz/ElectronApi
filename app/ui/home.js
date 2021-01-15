@@ -1,4 +1,5 @@
 const {ipcRenderer } = require("electron");
+const { $where } = require("../models/Ruta");
 
 const seleccionado =  document.querySelector("#ciudad");
 const rutaList = document.querySelector("#rutaList");
@@ -6,6 +7,10 @@ const rutaList = document.querySelector("#rutaList");
 const btnBuscar =document.querySelector("#btnBuscar");
 const btnClean = document.querySelector("#btnClean");
 const exit = document.querySelector(".exit");
+
+const btnAdd = document.querySelector("#btnAdd");
+
+
 //add ruta (ir al form)
 document.querySelector("#btnAdd").addEventListener('click', e => {
     ipcRenderer.send('addRuta');
@@ -13,13 +18,16 @@ document.querySelector("#btnAdd").addEventListener('click', e => {
 
 
 function deleteruta(id) {
-    const response = confirm("are you sure you want to delete it?");
+    
+    const response = confirm("¿esta seguro de que quiere eliminarlo?");
     if (response) {
       ipcRenderer.send("delete-ruta", id);
     }
     return;
 }
-
+function editruta(id) {
+    ipcRenderer.send("edit-ruta-form");
+}
 function renderrutas(rutas) {
     rutaList.innerHTML = "";
     console.log(rutas);
@@ -32,12 +40,14 @@ function renderrutas(rutas) {
                     <p class="card-text">${t.nombre}</p>
                     <p class="card-text">${t.descripcion}</p>
                     <p class="card-text">Transporte: ${t.transporte} </p>
-                    <p class="card-text">Localidad: ${t.ciudad} </p>
+                    <p class="card-text">Ciudad: ${t.ciudad} </p>
                     <p class="card-text">Dificultad: ${t.dificultad} </p>
+                    
+                    <p class="card-text">localizaciones: ${t.listaLocalizaciones} </p>
                     <div class="d-flex justify-content-between align-items-center">
                     <div class="btn-group">
-                        <button class="btn btn-danger" onclick="deleteruta('${t._id}')">🗑 Delete</button>
-                        <button class="btn btn-secondary" onclick="editruta('${t._id}')">✎ Edit</button>
+                        <button class="btn btn-danger" onclick="deleteruta('${t.id}')">🗑 Delete</button>
+                        <button class="btn btn-secondary" onclick="editruta('${t.id}')">✎ Edit</button>
                     </div>
                     </div>
                 </div>
@@ -52,18 +62,15 @@ let rutas = [];
 ipcRenderer.send("get-rutas");
 
 ipcRenderer.on("get-rutas", (e, args) => {
+    console.log("GET RUTAS " + args)
     const receivedrutas = JSON.parse(args);
     rutas = receivedrutas;
     renderrutas(rutas);
 });
 
-ipcRenderer.on("delete-ruta-success", (e, args) => {
-    const deletedruta = JSON.parse(args);
-    const newrutas = rutas.filter(t => {
-      return t._id !== deletedruta._id;
-    });
-    rutas = newrutas;
-    renderrutas(rutas);
+ipcRenderer.on("delete-ruta-success", () => {
+    ipcRenderer.send("get-rutas");
+    //renderrutas(rutas);
 });
   
 //formulario filtros
@@ -87,5 +94,11 @@ ipcRenderer.on("busqueda-realizada", (e, args) => {
 
 exit.addEventListener('click', e => {
     ipcRenderer.send('exit', 'salir');    
+});
+
+//ir al formulario
+btnAdd.addEventListener('click', e => {
+    console.log("ir al formulario de ruta");
+    ipcRenderer.send("create-ruta-form");
 });
   
