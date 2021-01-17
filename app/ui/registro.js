@@ -5,7 +5,7 @@ const nick = document.querySelector("#nickRegistro");
 const password = document.querySelector("#pwdRegistro");
 const nombre = document.querySelector("#nombreRegistro");
 const apellido = document.querySelector("#apellidoRegistro");
-
+const btnVolver = document.querySelector("#imgVolver");
 
 formRegistro.addEventListener('submit', e => {
   console.log("registrar");
@@ -13,7 +13,7 @@ formRegistro.addEventListener('submit', e => {
   const admin ={
     usuario:nick.value,
     nombre:nombre.value,
-    contraseña: password.value,
+    contrasena: password.value,
     apellido:apellido.value,
     rol:"admin",
     conectado:false,
@@ -28,3 +28,7 @@ ipcRenderer.on('new-admin-created', (e, args)=>{
   console.log(args);
   ipcRenderer.send('volver-login', 'volver');
 })
+//boton volver a login
+btnVolver.addEventListener('click', e => {
+  ipcRenderer.send("volver-login");
+});

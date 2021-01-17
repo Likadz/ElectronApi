@@ -1,4 +1,4 @@
-const { BrowserWindow, ipcMain, remote } = require("electron");
+const { BrowserWindow, ipcMain, remote, ipcRenderer } = require("electron");
 const Ruta = require("./models/Ruta");
 const Usuario = require("./models/Usuario");
 const { net } = require('electron')//para la conexion con la api
@@ -43,13 +43,13 @@ ipcMain.on("create-usuario", async (e, arg) => {
 ipcMain.on("login", async (e, arg) => {
   const usuario = new Usuario (arg);//usuario recibido por el form
   //llamada a la api
-  //const request = net.request('http://127.0.0.1:8080/usuarios/getLogin/'+usuario.nombre +'/'+usuario.contraseña+'/'+usuario.rol)
+  //const request = net.request('http://127.0.0.1:8080/usuarios/getLogin/'+usuario.nombre +'/'+usuario.contrasena+'/'+usuario.rol)
   const request = net.request({ 
     method: 'GET', 
     protocol: 'http:', 
     hostname: '127.0.0.1', 
     port: 8080,
-    path: '/usuarios/getLogin/'+usuario.nombre +'/'+usuario.contraseña+'/'+usuario.rol,
+    path: '/usuarios/getLogin/'+usuario.nombre +'/'+usuario.contrasena+'/'+usuario.rol,
     
   }); 
 
@@ -57,7 +57,7 @@ ipcMain.on("login", async (e, arg) => {
     console.log(`STATUS: ${response.statusCode}`);
     response.on('error', (error) => {
       console.log(`ERROR: ${JSON.stringify(error)}`)
-      e.reply("login-error","EL USUARIO O CONTRASEÑA SON INCORRECTOS");
+      e.reply("login-error","EL USUARIO O CONTRASEnA SON INCORRECTOS");
     })
     //cogemos la data 
     response.on('data', (chunk) => {
@@ -65,8 +65,8 @@ ipcMain.on("login", async (e, arg) => {
         console.log("en el if, al home");
         BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
       }else{
-        e.reply("login-error","EL USUARIO O CONTRASEÑA SON INCORRECTOS");
-        console.log("EL USUARIO O CONTRASEÑA SON INCORRECTOS");
+        e.reply("login-error","EL USUARIO O CONTRASEnA SON INCORRECTOS");
+        console.log("EL USUARIO O CONTRASEnA SON INCORRECTOS");
       }
       
     })
@@ -90,7 +90,7 @@ ipcMain.on("login", async (e, arg) => {
       //recorremos el array en busca de coincidencias
       for (let index = 0; index < usuariosCombo.length; index++) {
         const a=new Usuario (usuariosCombo[index])
-        if(a.nombre==usuario.nombre && a.contraseña ==usuario.contraseña && a.rol == usuario.rol && !a.conectado && a.conectado==usuario.conectado){
+        if(a.nombre==usuario.nombre && a.contrasena ==usuario.contrasena && a.rol == usuario.rol && !a.conectado && a.conectado==usuario.conectado){
           login=true;
         }
       }
@@ -98,8 +98,8 @@ ipcMain.on("login", async (e, arg) => {
         console.log("al home");
         BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
       }else{
-        e.reply("login-error","EL USUARIO O CONTRASEÑA SON INCORRECTOS");
-        console.log("EL USUARIO O CONTRASEÑA SON INCORRECTOS");
+        e.reply("login-error","EL USUARIO O CONTRASEnA SON INCORRECTOS");
+        console.log("EL USUARIO O CONTRASEnA SON INCORRECTOS");
       }
      
     })
@@ -110,6 +110,12 @@ ipcMain.on("login", async (e, arg) => {
   })
   request.end()*/
 });
+//Volver del registro al login
+ipcMain.on("volver-login", async (e, arg) => {
+  console.log("volver");
+  BrowserWindow.getFocusedWindow().loadFile('app/html/index.html')//cambiamos el html de la ventana.
+});
+
 
 ipcMain.on("get-rutas", async (e, arg) => {
   //const request = net.request({method:'delete',path:'http://127.0.0.1:8080/rutas/getAll'})

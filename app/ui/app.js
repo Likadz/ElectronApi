@@ -10,7 +10,7 @@ formLogin.addEventListener('submit', e => {
   e.preventDefault(); 
   const usuario ={
     nombre:nick.value,
-    contraseña: password.value,
+    contrasena: password.value,
     rol:"admin",
     conectado:false,
   }
