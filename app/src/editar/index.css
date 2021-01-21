@@ -1,17 +1,4 @@
-body::before {
-  content: '';
-  position: fixed;
-  width: 100vw;
-  height: 100vh;
-  background-image:  url(../resources/fondo_vectorizado.jpg);
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-position: 100% 100%;
-  background-size: cover;
-  xfilter: blur(2px);
-  filter: opacity(35%);
-  z-index: -9;
-}
+
 #regForm {
   background-color: #ffffff;
   margin: 100px auto;
