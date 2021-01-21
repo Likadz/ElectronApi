@@ -77,41 +77,9 @@ ipcMain.on("login", async (e, arg) => {
   })
   request.end()
   
-  
-  /*Con request all
-  const request = net.request('http://127.0.0.1:8080/usuarios/all')
-  request.on('response', (response) => {
-    //cogemos la data 
-    response.on('data', (chunk) => {
-      let usuariosCombo=[];//array de usuarios
-      for(let i = 0; i< JSON.parse(chunk).length; i++){
-        usuariosCombo.push(new Usuario(JSON.parse(chunk)[i]));//por cada elemento de la data parseada creamos un usuario en el array
-      }
-      //recorremos el array en busca de coincidencias
-      for (let index = 0; index < usuariosCombo.length; index++) {
-        const a=new Usuario (usuariosCombo[index])
-        if(a.nombre==usuario.nombre && a.contrasena ==usuario.contrasena && a.rol == usuario.rol && !a.conectado && a.conectado==usuario.conectado){
-          login=true;
-        }
-      }
-      if(login){
-        console.log("al home");
-        BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
-      }else{
-        e.reply("login-error","EL USUARIO O CONTRASEnA SON INCORRECTOS");
-        console.log("EL USUARIO O CONTRASEnA SON INCORRECTOS");
-      }
-     
-    })
-    //para saber que ha acabado.
-    response.on('end', () => {
-      console.log('No more data in response.')
-    })
-  })
-  request.end()*/
 });
 //Volver del registro al login
-ipcMain.on("volver-login", async (e, arg) => {
+ipcMain.on("volver-login", async () => {
   console.log("volver");
   BrowserWindow.getFocusedWindow().loadFile('app/html/index.html')//cambiamos el html de la ventana.
 });
@@ -188,7 +156,6 @@ ipcMain.on("exit", async (e, arg) => {
 
 //ir al form de crear ruta
 ipcMain.on("create-ruta-form", async (e, arg) => {
-  console.log("vamos al form");
   BrowserWindow.getFocusedWindow().loadFile('app/src/nuevo/index.html')//cambiamos el html de la ventana.
 });
 
@@ -198,4 +165,33 @@ ipcMain.on("edit-ruta-form", async (e, arg) => {
   BrowserWindow.getFocusedWindow().loadFile('app/src/editar/index.html')//cambiamos el html de la ventana.
 });
 
+//Obtener ciudades
+ipcMain.on('getCiudades',async (e)=>{
+  //cogemos las ciudades que existen para el formulario
+  const request = net.request('http://127.0.0.1:8080/rutas/getAll')
+  request.on('response', (response) => {
+    //cogemos la data 
+    response.on('data', (chunk) => {
+      //sacamos una lista de ciudades posibles 
+      let ciudades=[];
+      
+      for(let i = 0; i< JSON.parse(chunk).length; i++){
+        var ciudad = JSON.parse(chunk)[i]['ciudad'];
+        
+        var existe = false;
+        for(let j = 0; j < ciudades.length; j++){
+          if(ciudades[j] == ciudad){
+            existe=true;
+          }
+        }
+        if(!existe)
+          ciudades.push(JSON.parse(chunk)[i]['ciudad']);
+      }
+      console.log(ciudades);
+      e.reply("busqueda-ciudades", JSON.stringify(ciudades));//pasamos las rutas al app.js
+    })
+  })
+  request.end()
+
+})
 module.exports = { createWindow };

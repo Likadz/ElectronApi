@@ -1,4 +1,6 @@
 //import L from 'leaflet';
+window.$ = window.jQuery = require('jquery');
+
 
 var currentTab = 0; // Current tab is set to be the first tab (0)
 showTab(currentTab); // Display the current tab
@@ -14,7 +16,8 @@ L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
 var latlang;
 var lugar;
 var localizaciones = [];
-var listaPreguntas = [];
+var numLocalizaciones = 0;
+var listaMarker = [];
 
 var placesAutocomplete = places({
   appId: 'plOJC0RKIYMV',
@@ -23,34 +26,127 @@ var placesAutocomplete = places({
   templates: {
     value: function(suggestion) {
         map.setView([suggestion.latlng.lat,suggestion.latlng.lng],15);
-        latlang = suggestion;
-        lugar = suggestion.name;
     }
   },
   });
 
-  function datos(){
+  placesAutocomplete.on('change', e => {
+    map.setView([e.suggestion.latlng.lat,e.suggestion.latlng.lng],15);
+    console.log(e.suggestion.latlng);
+    latlang = e.suggestion.latlng;
+    lugar = e.suggestion.name;
+    $('#nombreLocalizacion').text(lugar);
+  });
 
+  function onMapClick(e) {
+    latlang = e.latlng;
+    lugar = e.name;
+    $('#nombreLocalizacion').text(lugar);
+    nuevaLocalizacion();
   }
 
+  map.on('click', onMapClick);
+  
   function nuevaLocalizacion(){
-    localizaciones.push([latlang.latlng.lat,latlang.latlng.lng]);
-    for (i= 0 ; localizaciones.length>i;i++){
-      marker = new L.marker(localizaciones[i]).addTo(map);
-      L.marker([51.5, -0.09]).addTo(map)
-    .bindPopup('Localizacion '+(i+1))
-    .openPopup();
-    }
+    localizaciones.push([latlang.lat,latlang.lng]);
+    console.log(localizaciones);
 
-    var option = document.createElement("option");
-    option.text = lugar;
-    option.value = lugar;
-    var select = document.getElementById("localizacionPregunta");
-    select.appendChild(option);
+    marker = new L.marker(localizaciones[numLocalizaciones]);
+    map.addLayer(marker);
+    marker.bindPopup('Localizacion '+(numLocalizaciones+1)).openPopup();
+
+    listaMarker.push(marker);
+
+
+    /*****NUEVA FILA TABLA*****/
+
+    $('#localizacionesDeRuta').append("<tr id='"+numLocalizaciones+"'></tr>");
+
+    $('#localizacionesDeRuta #'+numLocalizaciones).append("<th scope='row'>"+lugar+"</th><td></td>");
+
+    $('#localizacionesDeRuta #'+numLocalizaciones+" td").append("<Button type='button' onclick=borrar('"+numLocalizaciones+"')><em class='fas fa-eraser'></em></Button>");
+
+
+    /*****NUEVO QUESTIONARIO*****/
+
+    //NOMBRE LOCALIZACION
+
+    $('#accordeonPreguntas').append("<div id='div"+numLocalizaciones+"'><h1 onclick='pestana("+numLocalizaciones+")'>"+lugar+"</h1></div>");    
     
+    $("#div"+numLocalizaciones).append("<div class='subdiv'> </div>");
+
+    //ESCRBIR DESCRIPCION
+
+    $("#div"+numLocalizaciones+" .subdiv").append("Descripcion: <p><textarea id='descripcionPregunta"+numLocalizaciones+"' placeholder='Descripcion' name='' id='' style='resize: none; overflow: auto;'></textarea></p> ")
+
+    //ESCRBIR PREGUNTA A
+
+    $("#div"+numLocalizaciones+" .subdiv").append("Pregunta A:<p><input id='preguntaA"+numLocalizaciones+"' placeholder='Pregunta A' oninput=''></p> ");
+
+    //ESCRBIR PREGUNTA B
+
+    $("#div"+numLocalizaciones+" .subdiv").append("Pregunta B:<p><input id='preguntaB"+numLocalizaciones+"' placeholder='Pregunta B' oninput=''></p>");
+
+    //ESCRBIR PREGUNTA C
+
+    $("#div"+numLocalizaciones+" .subdiv").append("Pregunta C:<p><input id='preguntaC"+numLocalizaciones+"' placeholder='Pregunta C' oninput=''></p> ");
+
+    //ESCRBIR IMAGEN
+
+    $("#div"+numLocalizaciones+" .subdiv").append("Imagen:<p><input id='imagenPregunta"+numLocalizaciones+"' type='file'></p>");
+
+    //ELEGIR TIPO PREGUNTA
+    
+    $("#div"+numLocalizaciones+" .subdiv").append("<p><input type='radio' name='tipo' id='Pregunta"+numLocalizaciones+"'>    <label for='Pregunta'>Pregunta</label></p>");
+
+    $("#div"+numLocalizaciones+" .subdiv").append("<p><input type='radio' name='tipo' id='Localizacion"+numLocalizaciones+"'>    <label for='Localizacion'>Localizacion</label></p>");
+
+    //ELEGIR RESPUESTA CORRECTA
+
+    $("#div"+numLocalizaciones+" .subdiv").append("Respuesta correcta:    <p><select id='respuestaPregunta"+numLocalizaciones+"' class='form-select' aria-label='Default select example'>      <option selected>Open this select menu</option>      <option value='1'>A</option>      <option value='2'>B</option>      <option value='3'>C</option>  </select></p>");
+
+    $("#div"+numLocalizaciones+" .subdiv").hide();
+    $("#div0 .subdiv").show();
+
+    numLocalizaciones++;
   }
 
 
+function pestana(num){
+  
+  $("#div"+num+" .subdiv").toggle(500);
+  $(".subdiv").not("#div"+num+" .subdiv").hide(500);
+}
+
+function borrar(sitio){
+
+  $('#'+sitio).remove();
+  $('#div'+sitio).remove();
+
+  numLocalizaciones--;
+  map.removeLayer(listaMarker[sitio]);
+
+  listaMarker.splice(sitio, 1);
+
+  localizaciones.splice(sitio,1);
+  
+  console.log(sitio);
+
+  console.log(localizaciones);
+  console.log(listaMarker);
+  
+
+}
+
+function editar(sitio){
+  $("form div").hide();
+  $('#pregunta').show();
+}
+
+function salirEditar(){
+  window.location.href = 'index.html';
+
+}
 
 function showTab(n) {
   // This function will display the specified tab of the form ...
@@ -142,87 +238,54 @@ function fixStepIndicator(n) {
   x[n].className += " active";
 }
 
-var descripcion = document.getElementById('descripcionPregunta').value;
-var pregunta_a = document.getElementById('preguntaA').value;
-var pregunta_b = document.getElementById('preguntaB').value;
-var pregunta_c = document.getElementById('preguntaB').value;
-var imagen = document.getElementById('imagenPregunta').value;
-var tipo = "";
-var respuesta = document.getElementById('respuestaPregunta').value;
-var localizacion = document.getElementById('localizacionPregunta').value;
-
-document.getElementById("localizacionPregunta").addEventListener("change", e => {
-  
-  JSONPregunta = {
-    "descripcionPregunta":document.getElementById('descripcionPregunta').value,
-    "preguntaA":document.getElementById('preguntaA').value,
-    "preguntaB":document.getElementById('preguntaB').value,
-    "preguntaC":document.getElementById('preguntaC').value,
-    "imagenPregunta":document.getElementById('imagenPregunta').value,
-    "tipoPregunta":tipo,
-    "respuestaPregunta":document.getElementById('respuestaPregunta').value,
-    "localizacionPregunta":document.getElementById('localizacionPregunta').value
-  };
-
-  console.log(JSONPregunta["localizacionPregunta"]);
-
-  console.log(JSONPregunta["localizacionPregunta"] != "");
-  
-  esta =false;
-
-  for (i=0; i < listaPreguntas.length;i++){
-    console.log(listaPreguntas);
-    if(listaPreguntas[i]["localizacionPregunta"] == JSONPregunta["localizacionPregunta"]){
-      document.getElementById('descripcionPregunta').innerHTML=document.getElementById('descripcionPregunta').value;
-      document.getElementById('preguntaA').innerHTML=document.getElementById('preguntaA').value;
-      document.getElementById('preguntaB').innerHTML=document.getElementById('preguntaB').value;
-      document.getElementById('preguntaC').innerHTML=document.getElementById('preguntaC').value;
-      document.getElementById('imagenPregunta').innerHTML=""; 
-      esta = true;
-      break;
-    }
-    
-  }
-
-  if (!esta){
-    listaPreguntas.push(JSONPregunta);
-    document.getElementById('descripcionPregunta').value="";
-    document.getElementById('preguntaA').value="";
-    document.getElementById('preguntaB').value="";
-    document.getElementById('preguntaC').value="";
-    document.getElementById('imagenPregunta').value="";
-  }
-  /*if (JSONPregunta[localizacionPregunta] != ""){
-    
-  }
-  console.log(JSONPregunta);
-
-  for (i=0; i < listaPreguntas.length;i++){
-    console.log(listaPreguntas[0]);
-    if(listaPreguntas[i][localizacionPregunta] == document.getElementById('localizacionPregunta').value){
-      
-    }
-  }*/
-
-});
 
 function recogerYEnviar(){
   var difi;
-  for(i=0;i<document.getElementById('dificultad').getElementsByTagName("input").length;i++){
-    if(document.getElementById('dificultad').getElementsByTagName("input")[i].checked){
-      difi = document.getElementById('dificultad').getElementsByTagName("input")[i].value;
+  for(i=0;i<$('#dificultad input').length;i++){
+    if($('#dificultad input')[i].checked){
+      difi = $('#dificultad input')[i].value;
     }
   }
 
   var JSONRuta =  {
-  "nombreRuta" : document.getElementById('nombreRuta').value,
-  "descripcionRuta" : document.getElementById('descripcionRuta').value,
-  "imagenRuta" : document.getElementById('imagenRuta').value,
-  "ciudadRuta" : document.getElementById('ciudadRuta').value,
-  "transporteRuta" : document.getElementById('transporteRuta').value,
-  "tematicaRuta" : document.getElementById('tematicaRuta').value,
+  "nombreRuta" : $('#nombreRuta').val(),
+  "descripcionRuta" : $('#descripcionRuta').val(),
+  "imagenRuta" : $('#imagenRuta').val(),
+  "ciudadRuta" : $('#ciudadRuta').val(),
+  "transporteRuta" : $('#transporteRuta').val(),
+  "tematicaRuta" : $('#tematicaRuta').val(),
   "dificultadRuta":difi};
   
+  var localizacionesJSON = [];
+  console.log($('#accordeonPreguntas div').even().length);
+  for (i = 0; i < $('#accordeonPreguntas div').even().length; i++){
+    console.log('#div'+i+" #descripcionPregunta"+i);
+    var JSONPregunta = {
+      "descripcionPregunta" :  $('#div'+i+" #descripcionPregunta"+i).val(),
+      "preguntaA" : $('#div'+i+" #preguntaA"+i).val(),
+      "preguntaB" : $('#div'+i+" #preguntaB"+i).val(),
+      "preguntaC" : $('#div'+i+" #preguntaC"+i).val(),
+      "imagenPregunta" : $('#div'+i+" #imagenPregunta").val(),
+      "tipoPregunta" : $('#div'+i+" #tipoPregunta"+i).val(),
+      "respuestaCorrecta" : $('#div'+i+" #respuestaCorrecta"+i).val(),
+    }
+
+    var JSONLocalizacion = {
+      "nombre":$('#accordeonPreguntas div'+i).text(),
+      "latitud":localizaciones[i][0],
+      "longitud":localizaciones[i][1],
+      "pista":"aggd",
+      "oculta":true,
+      "pregunta":JSONPregunta,
+    }
+
+    localizacionesJSON.push(JSONLocalizacion);
+    
+  }
+
+  console.log(localizacionesJSON);
+    
+
   //Cambiar direccion por la de la api
   fetch('https://httpbin.org/post',{
         method: 'POST',

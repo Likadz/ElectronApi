@@ -1,6 +1,20 @@
 //import L from 'leaflet';
 window.$ = window.jQuery = require('jquery');
 
+//Obtener las ciudades de la base de datos
+const {ipcRenderer } = require("electron");
+ipcRenderer.send('getCiudades');
+ipcRenderer.on("busqueda-ciudades", (e, args) => {
+  const ciudades = JSON.parse(args);
+  console.log("las ciudades " +ciudades);
+  for(let i=0; i<ciudades.length; i++){
+    //añadir las ciudades al selector
+    var o = new Option(ciudades[i], ciudades[i]);//creamos una opcion
+    $(o).html(ciudades[i]);
+    $("#ciudadRuta").append(o);//la añadimos al selector
+  }
+});
+
 
 var currentTab = 0; // Current tab is set to be the first tab (0)
 showTab(currentTab); // Display the current tab
@@ -103,7 +117,7 @@ var placesAutocomplete = places({
 
     //ELEGIR RESPUESTA CORRECTA
 
-    $("#div"+numLocalizaciones+" .subdiv").append("Respuesta correcta:    <p><select id='respuestaPregunta"+numLocalizaciones+"' class='form-select' aria-label='Default select example'>      <option selected>Open this select menu</option>      <option value='1'>A</option>      <option value='2'>B</option>      <option value='3'>C</option>  </select></p>");
+    $("#div"+numLocalizaciones+" .subdiv").append("Respuesta correcta:    <p><select id='respuestaPregunta"+numLocalizaciones+"' class='form-select' aria-label='Default select example'>  <option value='1' selected>A</option>      <option value='2'>B</option>      <option value='3'>C</option>  </select></p>");
 
     $("#div"+numLocalizaciones+" .subdiv").hide();
     $("#div0 .subdiv").show();
@@ -199,6 +213,7 @@ function nextPrev(n) {
     showTab(currentTab);
     console.log('enviado');
     recogerYEnviar();
+    
     return false;
   }
   // Otherwise, display the correct tab:
@@ -248,14 +263,16 @@ function recogerYEnviar(){
   }
 
   var JSONRuta =  {
-  "nombreRuta" : $('#nombreRuta').val(),
-  "descripcionRuta" : $('#descripcionRuta').val(),
-  "imagenRuta" : $('#imagenRuta').val(),
-  "ciudadRuta" : $('#ciudadRuta').val(),
-  "transporteRuta" : $('#transporteRuta').val(),
-  "tematicaRuta" : $('#tematicaRuta').val(),
-  "dificultadRuta":difi};
-  
+    "nombre" : $('#nombreRuta').val(),
+    "descripcion" : $('#descripcionRuta').val(),
+    "imagen" : $('#imagenRuta').val(),
+    "ciudad" : $('#ciudadRuta').val(),
+    "transporte" : $('#transporteRuta').val(),
+    "tematica" : $('#tematicaRuta').val(),
+    "dificultad":difi,
+  };
+  console.log("RUTAS JSON " + JSON.stringify(JSONRuta));
+
   var localizacionesJSON = [];
   console.log($('#accordeonPreguntas div').even().length);
   for (i = 0; i < $('#accordeonPreguntas div').even().length; i++){
@@ -287,7 +304,7 @@ function recogerYEnviar(){
     
 
   //Cambiar direccion por la de la api
-  fetch('https://httpbin.org/post',{
+  fetch('http://127.0.0.1:8080/rutas/add',{
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -303,7 +320,6 @@ function recogerYEnviar(){
     .catch(function(err) {
         console.error(err);
     });
-
-  
+    
 
 }
