@@ -15,7 +15,7 @@ function createWindow() {
   //pantalla completa
   //win.setFullScreen(true)
 
-  win.loadFile("app/html/index.html");
+  win.loadFile("app/html/login.html");
 
 }
 
@@ -26,7 +26,7 @@ ipcMain.on("registro", (e, arg)=>{
 
 //cuando registra un usuario volvemos al login
 ipcMain.on("volver-login", (e, arg)=>{
-  BrowserWindow.getFocusedWindow().loadFile('app/html/index.html')//cambiamos el html de la ventana.
+  BrowserWindow.getFocusedWindow().loadFile('app/html/login.html')//cambiamos el html de la ventana.
 })
 
 //crear un usuario usuarioistrador
@@ -77,11 +77,6 @@ ipcMain.on("login", async (e, arg) => {
   })
   request.end()
   
-});
-//Volver del registro al login
-ipcMain.on("volver-login", async () => {
-  console.log("volver");
-  BrowserWindow.getFocusedWindow().loadFile('app/html/index.html')//cambiamos el html de la ventana.
 });
 
 
@@ -151,12 +146,12 @@ ipcMain.on("buscar", async (e, arg) => {
 
 ipcMain.on("exit", async (e, arg) => {
   console.log("LOGOUT");
-  BrowserWindow.getFocusedWindow().loadFile('app/html/index.html')//cambiamos el html de la ventana.
+  BrowserWindow.getFocusedWindow().loadFile('app/html/login.html')//cambiamos el html de la ventana.
 });
 
 //ir al form de crear ruta
 ipcMain.on("create-ruta-form", async (e, arg) => {
-  BrowserWindow.getFocusedWindow().loadFile('app/src/nuevo/index.html')//cambiamos el html de la ventana.
+  BrowserWindow.getFocusedWindow().loadFile('app/src/nuevo/nuevoForm.html')//cambiamos el html de la ventana.
 });
 
 //ir al form de editar ruta
@@ -194,4 +189,10 @@ ipcMain.on('getCiudades',async (e)=>{
   request.end()
 
 })
+
+ipcMain.on("volver-home", async (e, arg) => {
+  BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
+});
+
+
 module.exports = { createWindow };

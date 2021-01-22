@@ -106,9 +106,12 @@ input[type=submit]{
     bottom:10px;
     right: 10px;
 }
-#btnAdd{
-    background-color: rgb(145, 255, 178);
-}
+/*#btnAdd{
+    background-color: rgb(54, 54, 54);
+   
+    margin: 5%;
+    border-radius: 10%;
+}*/
 
 .cardMisEfectos{
     xborder-color: #00000059;
@@ -127,13 +130,13 @@ input[type=submit]{
 }
 .exit{
     
-    width: 50px;
-    height: 50px;
+    width: 100px;
+    height: 90px;
     margin-top: 2%;
-    background-color: rgba(255, 255, 255, 0.904); /* Black w/opacity/see-through */
+    xbackground-color: rgba(255, 255, 255, 0.904); /* Black w/opacity/see-through */
     border-radius: 50%;
     xpadding: 2%;
-    border: solid 5px rgba(255, 73, 73, 0.534);
+    xborder: solid 5px rgba(255, 73, 73, 0.534);
 }
 /* TUTORIAL */
 .btn-danger {
