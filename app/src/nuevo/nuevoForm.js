@@ -3,7 +3,7 @@ window.$ = window.jQuery = require('jquery');
 
 //Obtener las ciudades de la base de datos
 const {ipcRenderer } = require("electron");
-ipcRenderer.send('getCiudades');
+/*ipcRenderer.send('getCiudades');
 ipcRenderer.on("busqueda-ciudades", (e, args) => {
   const ciudades = JSON.parse(args);
   console.log("las ciudades " +ciudades);
@@ -13,7 +13,7 @@ ipcRenderer.on("busqueda-ciudades", (e, args) => {
     $(o).html(ciudades[i]);
     $("#ciudadRuta").append(o);//la añadimos al selector
   }
-});
+});*/
 const btnVolver = document.querySelector("#btnBack");
 //boton volver a home
 btnVolver.addEventListener('click', e => {
@@ -90,7 +90,7 @@ var placesAutocomplete = places({
 
     //NOMBRE LOCALIZACION
 
-    $('#accordeonPreguntas').append("<div id='div"+numLocalizaciones+"'><h1 onclick='pestana("+numLocalizaciones+")'>"+lugar+"</h1></div>");    
+    $('#accordeonPreguntas').append("<div id='div"+numLocalizaciones+"'><h1 onclick='pestana("+numLocalizaciones+")' id='h1Lugar"+numLocalizaciones+"'>"+lugar+"</h1></div>");    
     
     $("#div"+numLocalizaciones).append("<div class='subdiv'> </div>");
 
@@ -186,9 +186,6 @@ function showTab(n) {
   }
   if (n == (x.length - 1)) {
     document.getElementById("nextBtn").innerHTML = "Submit";
-    /*document.getElementById('nextBtn').onclick = function(){
-      ipcRenderer.send("volver-home");
-    }*/
   } else {
     document.getElementById("nextBtn").innerHTML = "Next";
   }
@@ -261,7 +258,7 @@ function fixStepIndicator(n) {
 
 
 function recogerYEnviar(){
-  var localizacionesJSON = [];
+  
   var difi;
   for(i=0;i<$('#dificultad input').length;i++){
     if($('#dificultad input')[i].checked){
@@ -279,12 +276,13 @@ function recogerYEnviar(){
     "dificultad":difi,
     "listaLocalizaciones":[],
   };
-  console.log("RUTAS JSON " + JSON.stringify(JSONRuta));
+  //console.log("RUTAS JSON " + JSON.stringify(JSONRuta));
 
-  
-  console.log($('#accordeonPreguntas div').even().length);
+  var localizacionesJSON = [];
+ // console.log($('#accordeonPreguntas div').even().length);
+ 
   for (i = 0; i < $('#accordeonPreguntas div').even().length; i++){
-    console.log('#div'+i+" #descripcionPregunta"+i);
+    //console.log('#div'+i+" #descripcionPregunta"+i);
     var JSONPregunta = {
       "descripcionPregunta" :  $('#div'+i+" #descripcionPregunta"+i).val(),
       "preguntaA" : $('#div'+i+" #preguntaA"+i).val(),
@@ -295,59 +293,27 @@ function recogerYEnviar(){
       "respuestaCorrecta" : $('#div'+i+" #respuestaCorrecta"+i).val(),
       
     }
-
+    
     var JSONLocalizacion = {
-      "nombre":$('#accordeonPreguntas div'+i).text(),
+      "nombre":$("#h1Lugar"+i).text(),
       "latitud":localizaciones[i][0],
       "longitud":localizaciones[i][1],
-      "pista":"aggd",
+      "pista":$("#h1Lugar"+i).text(),
       "oculta":true,
+      "rutaId":"0",
       "pregunta":JSONPregunta,
     }
 
     localizacionesJSON.push(JSONLocalizacion);
     
   }
-
+  
   console.log(localizacionesJSON);
-    
+  ipcRenderer.send('crear-ruta',JSONRuta);
+  ipcRenderer.send('crear-localizacion',localizacionesJSON);
+  
 
-  //Cambiar direccion por la de la api
-  fetch('http://127.0.0.1:8080/rutas/add',{
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(JSONRuta),
-    })
-    .then(function(response) {
-        return response.json();
-    })
-    .then(function(data) {
-        console.log('data = ', data);
-    })
-    .catch(function(err) {
-        console.error(err);
-    })
-    .then(
-      fetch('http://127.0.0.1:8080/localizaciones/add',{
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(JSONLocalizacion),
-        })
-        .then(function(response) {
-            return response.json();
-        })
-        .then(function(data) {
-            console.log('data = ', data);
-        })
-        .catch(function(err) {
-            console.error(err);
-        })
-    );
-    //volvemos al home
-    ipcRenderer.send("volver-home");
+  //volvemos al home
+  ipcRenderer.send("volver-home");
       
 }

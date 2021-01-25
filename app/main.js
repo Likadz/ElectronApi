@@ -81,8 +81,9 @@ ipcMain.on("login", async (e, arg) => {
 
 
 ipcMain.on("get-rutas", async (e, arg) => {
+ 
   //const request = net.request({method:'delete',path:'http://127.0.0.1:8080/rutas/getAll'})
-  const request = net.request({ 
+  request = net.request({ 
     method: 'GET', 
     protocol: 'http:', 
     hostname: '127.0.0.1', 
@@ -93,10 +94,18 @@ ipcMain.on("get-rutas", async (e, arg) => {
   request.on('response', (response) => {
     //cogemos la data 
     response.on('data', (chunk) => {
-      let rutas=[];//array de usuarios
-      for(let i = 0; i< JSON.parse(chunk).length; i++){
-        rutas.push(new Ruta(JSON.parse(chunk)[i]));//por cada elemento de la data parseada creamos un usuario en el array
+      
+      //console.log( JSON.parse(chunk)[0]);
+
+      let rutas=[];//array de rutas
+      var datos = JSON.parse(chunk.toString());
+      console.log("DATOS " + datos + " - " + datos.length);
+      for(let i = 0; i< datos.length; i++){
+        console.log("RUTA " + i + " " + JSON.stringify(JSON.parse(chunk)[i]));
+        rutas.push(datos[i]);
+        //rutas.push(new Ruta(JSON.parse(chunk)[i]));//por cada elemento de la data parseada creamos una ruta en el array
       }
+      //console.log(rutas);
       e.reply("get-rutas", JSON.stringify(rutas));//pasamos las rutas al app.js
     })
   })
@@ -106,7 +115,7 @@ ipcMain.on("get-rutas", async (e, arg) => {
 
 ipcMain.on("delete-ruta", async (e, args) => {
   //const rutaDeleted = await Ruta.findByIdAndDelete(args);
-  console.log("delete " + args);
+  //console.log("delete " + args);
   //const request = net.request('http://127.0.0.1:8080/rutas/deleteId/'+args)
   const request = net.request({ 
     method: 'DELETE', 
@@ -145,7 +154,7 @@ ipcMain.on("buscar", async (e, arg) => {
 });
 
 ipcMain.on("exit", async (e, arg) => {
-  console.log("LOGOUT");
+  //console.log("LOGOUT");
   BrowserWindow.getFocusedWindow().loadFile('app/html/login.html')//cambiamos el html de la ventana.
 });
 
@@ -156,43 +165,120 @@ ipcMain.on("create-ruta-form", async (e, arg) => {
 
 //ir al form de editar ruta
 ipcMain.on("edit-ruta-form", async (e, arg) => {
-  console.log("vamos al form edit");
+ // console.log("vamos al form edit");
   BrowserWindow.getFocusedWindow().loadFile('app/src/editar/index.html')//cambiamos el html de la ventana.
 });
-
-//Obtener ciudades
-ipcMain.on('getCiudades',async (e)=>{
-  //cogemos las ciudades que existen para el formulario
-  const request = net.request('http://127.0.0.1:8080/rutas/getAll')
-  request.on('response', (response) => {
-    //cogemos la data 
-    response.on('data', (chunk) => {
-      //sacamos una lista de ciudades posibles 
-      let ciudades=[];
-      
-      for(let i = 0; i< JSON.parse(chunk).length; i++){
-        var ciudad = JSON.parse(chunk)[i]['ciudad'];
-        
-        var existe = false;
-        for(let j = 0; j < ciudades.length; j++){
-          if(ciudades[j] == ciudad){
-            existe=true;
-          }
-        }
-        if(!existe)
-          ciudades.push(JSON.parse(chunk)[i]['ciudad']);
-      }
-      console.log(ciudades);
-      e.reply("busqueda-ciudades", JSON.stringify(ciudades));//pasamos las rutas al app.js
-    })
-  })
-  request.end()
-
-})
 
 ipcMain.on("volver-home", async (e, arg) => {
   BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
 });
 
+//crear ruta
+ipcMain.on("crear-ruta", async (e, arg) => {
+  var elBody = JSON.stringify(arg);
+ // console.log("crear Ruta " + JSON.parse(elBody));
+  const request = net.request({ 
+    method: 'POST', 
+    protocol: 'http:', 
+    hostname: '127.0.0.1', 
+    port: 8080,
+    path: '/rutas/add',
+    headers: {
+      'Content-Type': 'application/json'
+    }, 
+  }); 
+  //obtener id ruta
+  request.on('response', (response) => {
+    //cogemos la data 
+    response.on('data', (chunk) => {
+  //    console.log('RUTA ' + JSON.parse(chunk));
+    })
+  })
+  request.write(elBody);
+  request.end();
+});
+//funcion obtener id ultima ruta
+function obtenerIdRuta(localizacion){
+ // console.log("obtener ultima id ");
+  var idRuta="";//var id
+  const request = net.request({ 
+    method: 'GET', 
+    protocol: 'http:', 
+    hostname: '127.0.0.1', 
+    port: 8080,
+    path: '/rutas/getUltimaRuta'    
+  }); 
+  request.on('response', (response) => {
+    //cogemos la data 
+    response.on('data', (chunk) => {
+      var ruta=JSON.parse(chunk);
+      idRuta=ruta['id'];//actualizamos la variable con el valor de la id
+      crearLocalizacion(idRuta, localizacion);//llamamos a la funcion para crear la localizacion con la id y la localizacion actual
+    })
+  })
+  request.end();
+}
+//funcion crear localizacion
+function crearLocalizacion(idruta, localizacion){
+
+  //var elBody = JSON.stringify(localizacion[0]);//obtenemos el obj localizacion 0
+  //recorremos el array de localizaciones para obtener un json de uno en uno 
+  for(let i=0; i< localizacion.length; i++){
+    var elBody = JSON.stringify(localizacion[i]);//obtenemos el obj localizacion
+    
+    var json=JSON.parse(elBody);//creamos un json con el obj
+    json.rutaId=idruta;//modificamos el key 'rutaId'
+ //   console.log(json);
+    elBody=JSON.stringify(json);//volvemos a asignar al body los datos
+ //   console.log("EL BODY " + elBody);
+    //hacemos la llamada mandando el body
+    const request = net.request({ 
+      method: 'POST', 
+      protocol: 'http:', 
+      hostname: '127.0.0.1', 
+      port: 8080,
+      path: '/localizaciones/add',
+      headers: {
+        'Content-Type': 'application/json'
+      },   
+    }); 
+    request.on('response', (response) => {
+      //cogemos la data 
+      response.on('data', (chunk) => {
+ //       console.log('localizacion ' + JSON.parse(chunk));
+      })
+    })
+    request.write(elBody);
+    request.end();
+    
+  }
+  actualizarDatos(idruta);//funcion para actualizar la lista de localizaciones de la ruta
+}
+//actualizar la lista de localizaciones de la ruta con id X
+function actualizarDatos(id){
+ // console.log("id " + id);
+  const request = net.request({ 
+    method: 'PUT', 
+    protocol: 'http:', 
+    hostname: '127.0.0.1', 
+    port: 8080,
+    path: '/rutas/editIdListado/'+id,
+    headers: {
+      'Content-Type': 'application/json'
+    },   
+  }); 
+  request.on('response', (response) => {
+    response.on('data', (chunk) => {
+      console.log("datos actualizados");
+    })
+  })
+  request.end();
+}
+
+//crear localizacion
+ipcMain.on("crear-localizacion", (e, arg) => {
+  //llamamos a la funcion para obtener la id de la última ruta creada
+  obtenerIdRuta(arg);
+});
 
 module.exports = { createWindow };

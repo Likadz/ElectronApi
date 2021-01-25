@@ -42,8 +42,6 @@ function renderrutas(rutas) {
                     <p class="card-text">Transporte: ${t.transporte} </p>
                     <p class="card-text">Ciudad: ${t.ciudad} </p>
                     <p class="card-text">Dificultad: ${t.dificultad} </p>
-                    
-                    <p class="card-text">localizaciones: ${t.listaLocalizaciones} </p>
                     <div class="d-flex justify-content-between align-items-center">
                     <div class="btn-group">
                         <button class="btn btn-danger" onclick="deleteruta('${t.id}')">🗑 Delete</button>
