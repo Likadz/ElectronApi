@@ -31,21 +31,26 @@ function editruta(id) {
 function renderrutas(rutas) {
     rutaList.innerHTML = "";
     console.log(rutas);
-    rutas.map(t => {
+    
+    rutas.map(r => {
+    //si la ruta no tiene imagen definida le ponemos una basica
+    if(r.imagen=="" || r.imagen==null){
+        r.imagen="fondo.jpg";
+    }
     rutaList.innerHTML += `
         <div class="col-md-4 " >
             <div class="card mb-4 cardMisEfectos">
-                <img class="card-img-top" src="../resources/${t.imagen}" alt="ruta image cap">
+                <img class="card-img-top" src="../resources/${r.imagen}" alt="ruta image cap">
                 <div class="card-body">
-                    <p class="card-text">${t.nombre}</p>
-                    <p class="card-text">${t.descripcion}</p>
-                    <p class="card-text">Transporte: ${t.transporte} </p>
-                    <p class="card-text">Ciudad: ${t.ciudad} </p>
-                    <p class="card-text">Dificultad: ${t.dificultad} </p>
+                    <p class="card-text">${r.nombre}</p>
+                    <p class="card-text">${r.descripcion}</p>
+                    <p class="card-text">Transporte: ${r.transporte} </p>
+                    <p class="card-text">Ciudad: ${r.ciudad} </p>
+                    <p class="card-text">Dificultad: ${r.dificultad} </p>
                     <div class="d-flex justify-content-between align-items-center">
                     <div class="btn-group">
-                        <button class="btn btn-danger" onclick="deleteruta('${t.id}')">🗑 Delete</button>
-                        <button class="btn btn-secondary" onclick="editruta('${t.id}')">✎ Edit</button>
+                        <button class="btn btn-danger" onclick="deleteruta('${r.id}')">🗑 Delete</button>
+                        <button class="btn btn-secondary" onclick="editruta('${r.id}')">✎ Edit</button>
                     </div>
                     </div>
                 </div>
@@ -58,7 +63,6 @@ function renderrutas(rutas) {
 let rutas = [];
 
 ipcRenderer.send("get-rutas");
-
 ipcRenderer.on("get-rutas", (e, args) => {
     console.log("GET RUTAS " + args)
     loading.style.visibility='hidden';

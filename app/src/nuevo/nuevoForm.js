@@ -112,7 +112,7 @@ var placesAutocomplete = places({
 
     //ESCRBIR IMAGEN
 
-    $("#div"+numLocalizaciones+" .subdiv").append("Imagen:<p><input id='imagenPregunta"+numLocalizaciones+"' type='file'></p>");
+    $("#div"+numLocalizaciones+" .subdiv").append("Imagen:<p><input id='imagenPregunta"+numLocalizaciones+"' type='file' ></p>");
 
     //ELEGIR TIPO PREGUNTA
     $("#div"+numLocalizaciones+" .subdiv").append("<p><input type='radio' name='tipo' id='Pregunta"+numLocalizaciones+"'>    <label for='Pregunta'>Pregunta</label></p>");
@@ -292,11 +292,12 @@ function recogerYEnviar(){
       "preguntaC" : $("#preguntaC"+i).val(),
       "imagenPregunta" : $("#imagenPregunta").val(),
       "tipoPregunta" : $("#tipoPregunta"+i).val(),
-      "respuestaCorrecta" : $("#respuestaCorrecta"+i).val(),
+      "respuestaCorrecta" : $("#respuestaCorrecta"+i).find(":selected").val(),
       
     }
-    console.log("PREGUNTA DATOS "+ JSONPregunta);
-
+    console.log("PREGUNTA DATOS "+ JSON.stringify(JSONPregunta));
+    var preguntaJSON=[];
+    preguntaJSON.push(JSONPregunta);
     var JSONLocalizacion = {
       "nombre":$("#h1Lugar"+i).text(),
       "latitud":localizaciones[i][0],
@@ -304,7 +305,7 @@ function recogerYEnviar(){
       "pista":$("#h1Lugar"+i).text(),
       "oculta":true,
       "rutaId":"0",
-      "pregunta":JSONPregunta,
+      "pregunta":preguntaJSON,
     }
 
     localizacionesJSON.push(JSONLocalizacion);

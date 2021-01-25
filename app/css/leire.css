@@ -73,7 +73,8 @@ input[type=submit]{
 /* container parte superior home*/
 #containerSup{
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
+    flex-flow: row ;
     width: 95%;
     margin: 0 auto;
     padding: 5px 0;
@@ -81,23 +82,21 @@ input[type=submit]{
 
 /* container filtros del home */
 #containerFiltros{
-    display: flex;
-    flex-flow: row wrap;
-    align-items: center;
+   
+    justify-content: space-around;
     background-color: rgb(0,0,0); /* Fallback color */
     background-color: rgba(0,0,0, 0.4); /* Black w/opacity/see-through */
     color: white;
     font-weight: bold;
     border: 3px solid #f1f1f1;
-   padding:1%
+    xpadding: 2%;
+    text-align: center;
     width:70%;
 }
-#elementosFiltros{
-    xpadding:10px;
-    margin:5%;
-}
-#formFiltros{
-    justify-content: space-between;
+#containerFiltros>form{
+    display: flex;
+    margin-top: 3%;
+    justify-content: space-around;
 }
 
 #containerContenidoHome{
@@ -134,14 +133,13 @@ input[type=submit]{
     border: solid 5px rgba(255, 73, 73, 0.534);
 }
 .exit{
-    
     width: 100px;
     height: 90px;
-    margin-top: 2%;
-    xbackground-color: rgba(255, 255, 255, 0.904); /* Black w/opacity/see-through */
+    margin-top: 1%;
     border-radius: 50%;
-    xpadding: 2%;
-    xborder: solid 5px rgba(255, 73, 73, 0.534);
+}
+.chat{
+    margin-top: 1%;
 }
 /* TUTORIAL */
 .btn-danger {
