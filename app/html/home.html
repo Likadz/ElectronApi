@@ -15,42 +15,45 @@
   <div id="containerSup">
     
     <img class="exit btn" src="../resources/explorer.png" alt="" >
-    
+    <div id="loading" visibility='visible'></div>
+
     <div id="containerFiltros">
-      <form id="formFiltros" >
-        <div class="form-row align-items-center">
-          <div class="col-md-3 mb-3">
-            <label for="ciudad">Selecciona la ciudad</label>
-            <select name="ciudad" id="ciudad" >
-              <option value="Irun">Irun</option>
-              <option value="Donostia">donostia</option>
-              <option value="Pamplona">Pamplona</option>
-              <option value="Andoain">Andoain</option>
-            </select>
+      <div id="elementosFiltros">
+        <form id="formFiltros" >
+          <div class="form-row align-items-center">
+            <div class="">
+              <label for="ciudad">Selecciona la ciudad</label>
+              <select name="ciudad" id="ciudad" >
+                <option value="Irun">Irun</option>
+                <option value="Donostia">donostia</option>
+                <option value="Pamplona">Pamplona</option>
+                <option value="Andoain">Andoain</option>
+              </select>
+            </div>
+            <!--
+            <div class="col-md-3 mb-3">
+              <label for="inlineRadioOptions"> Estado de la ruta:</label>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="todos" selected>
+                <label class="form-check-label" for="inlineRadio1" >Todos</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="activos">
+                <label class="form-check-label" for="inlineRadio2">Activos</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="inactivos">
+                <label class="form-check-label" for="inlineRadio3">Inactivos</label>
+              </div>
+            </div>-->
+            <div class=""> 
+              <button type="button" class="btn btn-primary" id="btnBuscar">Buscar</button>
+              <button type="button" class="btn" id="btnClean">Clean</button>
+            </div>
           </div>
           
-          <div class="col-md-3 mb-3">
-            <label for="inlineRadioOptions"> Estado de la ruta:</label>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="todos" selected>
-              <label class="form-check-label" for="inlineRadio1" >Todos</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="activos">
-              <label class="form-check-label" for="inlineRadio2">Activos</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="inactivos">
-              <label class="form-check-label" for="inlineRadio3">Inactivos</label>
-            </div>
-          </div>
-          <div class="col-md-3 mb-3"> 
-            <button type="button" class="btn btn-primary" id="btnBuscar">Buscar</button>
-            <button type="button" class="btn" id="btnClean">Clean</button>
-          </div>
-        </div>
-        
-      </form>
+        </form>
+      </div>
     </div>
     <img src="../resources/chat.png" alt="" width="70px" height="70px"  id="imgChat">
    

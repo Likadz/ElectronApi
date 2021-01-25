@@ -9,7 +9,7 @@ const btnClean = document.querySelector("#btnClean");
 const exit = document.querySelector(".exit");
 
 const btnAdd = document.querySelector("#btnAdd");
-
+const loading = document.querySelector("#loading");
 
 //add ruta (ir al form)
 document.querySelector("#btnAdd").addEventListener('click', e => {
@@ -26,7 +26,7 @@ function deleteruta(id) {
     return;
 }
 function editruta(id) {
-    ipcRenderer.send("edit-ruta-form");
+    ipcRenderer.send("edit-ruta-form",id);
 }
 function renderrutas(rutas) {
     rutaList.innerHTML = "";
@@ -61,6 +61,7 @@ ipcRenderer.send("get-rutas");
 
 ipcRenderer.on("get-rutas", (e, args) => {
     console.log("GET RUTAS " + args)
+    loading.style.visibility='hidden';
     const receivedrutas = JSON.parse(args);
     rutas = receivedrutas;
     renderrutas(rutas);

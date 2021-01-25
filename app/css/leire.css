@@ -89,7 +89,12 @@ input[type=submit]{
     color: white;
     font-weight: bold;
     border: 3px solid #f1f1f1;
-    padding: 5%;
+   padding:1%
+    width:70%;
+}
+#elementosFiltros{
+    xpadding:10px;
+    margin:5%;
 }
 #formFiltros{
     justify-content: space-between;
@@ -164,4 +169,15 @@ input[type=submit]{
     border-radius: 50%;
     xpadding: 1%;
     border: solid 5px rgb(156, 219, 255);
+}
+
+/*LOADING*/
+#loading {
+    background: url('../resources/loading.gif') no-repeat center center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 9999999;
 }

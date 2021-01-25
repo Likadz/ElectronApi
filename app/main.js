@@ -2,7 +2,7 @@ const { BrowserWindow, ipcMain, remote, ipcRenderer } = require("electron");
 const Ruta = require("./models/Ruta");
 const Usuario = require("./models/Usuario");
 const { net } = require('electron')//para la conexion con la api
-
+const delay = ms => new Promise(res => setTimeout(res, ms));
 function createWindow() {
   const win = new BrowserWindow({
     width: 500,
@@ -81,7 +81,9 @@ ipcMain.on("login", async (e, arg) => {
 
 
 ipcMain.on("get-rutas", async (e, arg) => {
- 
+
+  
+  
   //const request = net.request({method:'delete',path:'http://127.0.0.1:8080/rutas/getAll'})
   request = net.request({ 
     method: 'GET', 
@@ -89,26 +91,62 @@ ipcMain.on("get-rutas", async (e, arg) => {
     hostname: '127.0.0.1', 
     port: 8080,
     path: '/rutas/getAll'
-    
   }); 
-  request.on('response', (response) => {
-    //cogemos la data 
-    response.on('data', (chunk) => {
-      
-      //console.log( JSON.parse(chunk)[0]);
 
-      let rutas=[];//array de rutas
-      var datos = JSON.parse(chunk.toString());
-      console.log("DATOS " + datos + " - " + datos.length);
-      for(let i = 0; i< datos.length; i++){
-        console.log("RUTA " + i + " " + JSON.stringify(JSON.parse(chunk)[i]));
-        rutas.push(datos[i]);
-        //rutas.push(new Ruta(JSON.parse(chunk)[i]));//por cada elemento de la data parseada creamos una ruta en el array
+  request.on('response',  (response) => {
+    //await delay(3000);
+    //cogemos la data 
+    response.on('data',async (chunk) => {
+      try{
+        //variables inicializadas limpias
+        chunkString=null;
+        datos=null;
+        rutas=[];
+        
+        console.log("\nchunkString -" + chunkString + "- datos -" + datos + "- rutas -" + rutas);
+        //cambiamos los valores de las variables
+        chunkString=chunk.toString();
+        console.log("---------------------------\ndatos en STRING\n---------------------------------\n" + chunkString);
+        /*var d = JSON.parse(chunkString);
+        console.log(d);
+        console.log(chunkString);
+        console.log( JSON.parse(chunk)[5]);*/
+        
+      // let rutas=[];//array de rutas
+      // var datos = "";
+
+      
+        datos=JSON.parse(chunkString);
+        console.log("---------------------------------\nDATOS\n---------------------------------\n" + datos + " - " + datos.length);
+        /*for(let i = 0; i< datos.length; i++){
+          //console.log("RUTA " + i + " " + JSON.stringify(JSON.parse(chunk)[i]));
+          console.log("RUTA " + i + "\n" + JSON.stringify(datos[i]));
+          rutas.push(datos[i]);
+          //rutas.push(new Ruta(JSON.parse(chunk)[i]));//por cada elemento de la data parseada creamos una ruta en el array
+        }
+        */
+        rutas=JSON.stringify(datos);
+        console.log("---------------------------------\nARRAY RUTAS\n---------------------------------\n" + rutas);
+        e.reply("get-rutas", JSON.stringify(datos));//pasamos las rutas al app.js
+      }catch(SyntaxError){
+        console.log("el puto error");
+        await delay(2000);
+        BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
       }
-      //console.log(rutas);
-      e.reply("get-rutas", JSON.stringify(rutas));//pasamos las rutas al app.js
-    })
-  })
+    },
+    response.on('error', (error) => {
+      console.log(`ERROR: ${JSON.stringify(error)}`)
+      //e.reply("login-error","EL USUARIO O CONTRASEnA SON INCORRECTOS");
+    }),
+    response.on('SyntaxError', function (error) {
+      console.log("ERROR DE SINTAXIS")
+    }));
+    
+  }) 
+  request.on("error",(error) => {
+    console.log(`ERROR: ${JSON.stringify(error)}`)
+    //e.reply("login-error","EL USUARIO O CONTRASEnA SON INCORRECTOS");
+  }),
   request.end()
   
 });
@@ -165,8 +203,9 @@ ipcMain.on("create-ruta-form", async (e, arg) => {
 
 //ir al form de editar ruta
 ipcMain.on("edit-ruta-form", async (e, arg) => {
- // console.log("vamos al form edit");
-  BrowserWindow.getFocusedWindow().loadFile('app/src/editar/index.html')//cambiamos el html de la ventana.
+  console.log("vamos al form edit");
+  console.log(arg);
+  BrowserWindow.getFocusedWindow().loadFile('app/src/editar/editForm.html')//cambiamos el html de la ventana.
 });
 
 ipcMain.on("volver-home", async (e, arg) => {

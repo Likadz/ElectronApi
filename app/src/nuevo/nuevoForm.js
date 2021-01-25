@@ -265,7 +265,9 @@ function recogerYEnviar(){
       difi = $('#dificultad input')[i].value;
     }
   }
-
+  if($('#imagenRuta').val()==null){
+    $('#imagenRuta').val('foto.jpg');
+  }
   var JSONRuta =  {
     "nombre" : $('#nombreRuta').val(),
     "descripcion" : $('#descripcionRuta').val(),
@@ -284,16 +286,17 @@ function recogerYEnviar(){
   for (i = 0; i < $('#accordeonPreguntas div').even().length; i++){
     //console.log('#div'+i+" #descripcionPregunta"+i);
     var JSONPregunta = {
-      "descripcionPregunta" :  $('#div'+i+" #descripcionPregunta"+i).val(),
-      "preguntaA" : $('#div'+i+" #preguntaA"+i).val(),
-      "preguntaB" : $('#div'+i+" #preguntaB"+i).val(),
-      "preguntaC" : $('#div'+i+" #preguntaC"+i).val(),
-      "imagenPregunta" : $('#div'+i+" #imagenPregunta").val(),
-      "tipoPregunta" : $('#div'+i+" #tipoPregunta"+i).val(),
-      "respuestaCorrecta" : $('#div'+i+" #respuestaCorrecta"+i).val(),
+      "descripcionPregunta" :  $("#descripcionPregunta"+i).val(),
+      "preguntaA" : $("#preguntaA"+i).val(),
+      "preguntaB" : $("#preguntaB"+i).val(),
+      "preguntaC" : $("#preguntaC"+i).val(),
+      "imagenPregunta" : $("#imagenPregunta").val(),
+      "tipoPregunta" : $("#tipoPregunta"+i).val(),
+      "respuestaCorrecta" : $("#respuestaCorrecta"+i).val(),
       
     }
-    
+    console.log("PREGUNTA DATOS "+ JSONPregunta);
+
     var JSONLocalizacion = {
       "nombre":$("#h1Lugar"+i).text(),
       "latitud":localizaciones[i][0],
