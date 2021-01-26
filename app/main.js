@@ -93,9 +93,9 @@ ipcMain.on("login", async (e, arg) => {
 
 
 ipcMain.on("get-rutas", async (e, arg) => {
-  
+/*
   //const request = net.request({method:'delete',path:'http://127.0.0.1:8080/rutas/getAll'})
-  request = net.request({ 
+  request = await net.request({ 
     method: 'GET', 
     protocol: 'http:', 
     hostname: '127.0.0.1', 
@@ -130,21 +130,15 @@ ipcMain.on("get-rutas", async (e, arg) => {
         BrowserWindow.getFocusedWindow().reload();
         //BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
       }
-    },
-    response.on('error', (error) => {
-      console.log(`ERROR: ${JSON.stringify(error)}`)
-      //e.reply("login-error","EL USUARIO O CONTRASEnA SON INCORRECTOS");
-    }),
-    response.on('SyntaxError', function (error) {
-      console.log("ERROR DE SINTAXIS")
-    }));
-    
-  }) 
-  request.on("error",(error) => {
-    console.log(`ERROR: ${JSON.stringify(error)}`)
-    //e.reply("login-error","EL USUARIO O CONTRASEnA SON INCORRECTOS");
-  }),
-  request.end()
+    }
+  )}); 
+  request.end();
+
+  */
+  //SIN LLAMADA A API PERO VA BIEN --> si usamos esto en el home los botones edit/delete tienen que coger el _id no id
+  const rutas = await Ruta.find();
+ // console.log("RUTAS FIND " + rutas);
+  e.reply("get-rutas", JSON.stringify(rutas));//pasamos las rutas al app.js
   
 });
 
@@ -152,7 +146,8 @@ ipcMain.on("delete-ruta", async (e, args) => {
   //const rutaDeleted = await Ruta.findByIdAndDelete(args);
   //console.log("delete " + args);
   //const request = net.request('http://127.0.0.1:8080/rutas/deleteId/'+args)
-  const request = net.request({ 
+
+  const request = await net.request({ 
     method: 'DELETE', 
     protocol: 'http:', 
     hostname: '127.0.0.1', 
@@ -163,8 +158,7 @@ ipcMain.on("delete-ruta", async (e, args) => {
   request.on('response', (response) => {
     //cogemos la data 
     response.on('data', (chunk) => {
-     
-      
+     console.log("ELIMINAR ruta" + JSON.stringify(chunk));
     })
   })
   request.end()
@@ -223,7 +217,7 @@ ipcMain.on("volver-home", async (e, arg) => {
 ipcMain.on("crear-ruta", async (e, arg) => {
   var elBody = JSON.stringify(arg);
  // console.log("crear Ruta " + JSON.parse(elBody));
-  const request = net.request({ 
+  const request = await net.request({ 
     method: 'POST', 
     protocol: 'http:', 
     hostname: '127.0.0.1', 
@@ -244,10 +238,10 @@ ipcMain.on("crear-ruta", async (e, arg) => {
   request.end();
 });
 //funcion obtener id ultima ruta
-function obtenerIdRuta(localizacion){
+async function obtenerIdRuta(localizacion){
  // console.log("obtener ultima id ");
   var idRuta="";//var id
-  const request = net.request({ 
+  const request = await net.request({ 
     method: 'GET', 
     protocol: 'http:', 
     hostname: '127.0.0.1', 
@@ -265,7 +259,7 @@ function obtenerIdRuta(localizacion){
   request.end();
 }
 //funcion crear localizacion
-function crearLocalizacion(idruta, localizacion){
+async function crearLocalizacion(idruta, localizacion){
   console.log(localizacion);
   //recorremos el array de localizaciones para obtener un json de uno en uno 
   for(let i=0; i< localizacion.length; i++){
@@ -273,7 +267,7 @@ function crearLocalizacion(idruta, localizacion){
     
     var json=JSON.parse(elBody);//creamos un json con el obj
     json.rutaId=idruta;//modificamos el key 'rutaId'
- //   console.log(json);
+   //console.log(json);
     elBody=JSON.stringify(json);//volvemos a asignar al body los datos
     console.log("EL BODY " + elBody);
     /*var p=[];
@@ -298,7 +292,7 @@ function crearLocalizacion(idruta, localizacion){
     request.on('response', (response) => {
       //cogemos la data 
       response.on('data', (chunk) => {
- //       console.log('localizacion ' + JSON.parse(chunk));
+        console.log('localizacion ' + JSON.parse(chunk));
       })
     })
     request.write(elBody);

@@ -49,8 +49,8 @@ function renderrutas(rutas) {
                     <p class="card-text">Dificultad: ${r.dificultad} </p>
                     <div class="d-flex justify-content-between align-items-center">
                     <div class="btn-group">
-                        <button class="btn btn-danger" onclick="deleteruta('${r.id}')">🗑 Delete</button>
-                        <button class="btn btn-secondary" onclick="editruta('${r.id}')">✎ Edit</button>
+                        <button class="btn btn-danger" onclick="deleteruta('${r._id}')">🗑 Delete</button>
+                        <button class="btn btn-secondary" onclick="editruta('${r._id}')">✎ Edit</button>
                     </div>
                     </div>
                 </div>
@@ -64,10 +64,11 @@ let rutas = [];
 
 ipcRenderer.send("get-rutas");
 ipcRenderer.on("get-rutas", (e, args) => {
-    console.log("GET RUTAS " + args)
+   
     loading.style.visibility='hidden';
     const receivedrutas = JSON.parse(args);
     rutas = receivedrutas;
+    console.log("GET RUTAS " + rutas)
     renderrutas(rutas);
 });
 

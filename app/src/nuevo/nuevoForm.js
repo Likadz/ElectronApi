@@ -121,14 +121,17 @@ var placesAutocomplete = places({
 
     //ELEGIR RESPUESTA CORRECTA
 
-    $("#div"+numLocalizaciones+" .subdiv").append("Respuesta correcta:    <p><select id='respuestaPregunta"+numLocalizaciones+"' class='form-select' aria-label='Default select example'>  <option value='1' selected>A</option>      <option value='2'>B</option>      <option value='3'>C</option>  </select></p>");
+    $("#div"+numLocalizaciones+" .subdiv").append("Respuesta correcta:    <p><select id='respuestaPregunta"+numLocalizaciones+"' class='form-select' aria-label='Default select example'> <option selected>selecciona la respuesta correcta</option>  <option value='1'>A</option>      <option value='2'>B</option>      <option value='3'>C</option>  </select></p>");
+    //$("#div"+numLocalizaciones+" .subdiv").append(`Respuesta correcta:    <p><select id='respuestaPregunta"+numLocalizaciones+"' class='form-select' aria-label='Default select example'> <option selected>selecciona la respuesta correcta</option>  <option value='1'>A</option>      <option value='2'>B</option>      <option value='3'>C</option>  </select></p>` );
 
     $("#div"+numLocalizaciones+" .subdiv").hide();
     $("#div0 .subdiv").show();
 
     numLocalizaciones++;
+ 
   }
 
+  
 
 function pestana(num){
   
@@ -258,7 +261,6 @@ function fixStepIndicator(n) {
 
 
 function recogerYEnviar(){
-  
   var difi;
   for(i=0;i<$('#dificultad input').length;i++){
     if($('#dificultad input')[i].checked){
@@ -284,20 +286,20 @@ function recogerYEnviar(){
  // console.log($('#accordeonPreguntas div').even().length);
  
   for (i = 0; i < $('#accordeonPreguntas div').even().length; i++){
-    //console.log('#div'+i+" #descripcionPregunta"+i);
+    console.log($( "#respuetaPregunta"+i +" option:selected").text());
     var JSONPregunta = {
-      "descripcionPregunta" :  $("#descripcionPregunta"+i).val(),
-      "preguntaA" : $("#preguntaA"+i).val(),
-      "preguntaB" : $("#preguntaB"+i).val(),
-      "preguntaC" : $("#preguntaC"+i).val(),
-      "imagenPregunta" : $("#imagenPregunta").val(),
-      "tipoPregunta" : $("#tipoPregunta"+i).val(),
-      "respuestaCorrecta" : $("#respuestaCorrecta"+i).find(":selected").val(),
+      "pregunta" :  $("#descripcionPregunta"+i).val(),
+      "respuesta1" : $("#preguntaA"+i).val(),
+      "respuesta2" : $("#preguntaB"+i).val(),
+      "respuesta3" : $("#preguntaC"+i).val(),
+      "imagen" : $("#imagenPregunta"+i).val(),
+      "tipo" : "pregunta",
+      "correcta" :$( "#respuetaPregunta"+i).val(),
       
     }
-    console.log("PREGUNTA DATOS "+ JSON.stringify(JSONPregunta));
+    /*console.log("PREGUNTA DATOS "+ JSON.stringify(JSONPregunta));
     var preguntaJSON=[];
-    preguntaJSON.push(JSONPregunta);
+    preguntaJSON.push(JSONPregunta);*/
     var JSONLocalizacion = {
       "nombre":$("#h1Lugar"+i).text(),
       "latitud":localizaciones[i][0],
@@ -305,7 +307,7 @@ function recogerYEnviar(){
       "pista":$("#h1Lugar"+i).text(),
       "oculta":true,
       "rutaId":"0",
-      "pregunta":preguntaJSON,
+      "pregunta":JSONPregunta,
     }
 
     localizacionesJSON.push(JSONLocalizacion);
@@ -318,6 +320,6 @@ function recogerYEnviar(){
   
 
   //volvemos al home
-  ipcRenderer.send("volver-home");
+  //ipcRenderer.send("volver-home");
       
 }
