@@ -1,37 +1,45 @@
-const { BrowserWindow, ipcMain, remote, ipcRenderer } = require("electron");
+const { BrowserWindow, ipcMain, remote } = require("electron");
 const Ruta = require("./models/Ruta");
 const Usuario = require("./models/Usuario");
 const { net } = require('electron')//para la conexion con la api
 const delay = ms => new Promise(res => setTimeout(res, ms));
-const Pregunta = require("./models/Pregunta");
+
+//variables globales
 var idUsuarioConectado;
+var rutaEdit;
+
+//Creacion de la ventana
 function createWindow() {
   const win = new BrowserWindow({
     width: 500,
     height: 700,
     webPreferences: {
       nodeIntegration: true
-    }
+    },
+    icon:'./app/resources/logo.png'//cambiar el logo del programa
   });
   
   //pantalla completa
-  //win.setFullScreen(true)
-
-  win.loadFile("app/html/login.html");
+  win.setFullScreen(true)
+  win.removeMenu();//quitar menu superior
+  win.loadFile("app/html/login.html");//html de
 
 }
 
-//window registro
+/* ***************************************************************************************************
+*********************************** REGISTRO  ********************************************************
+*****************************************************************************************************/
+//cargar pantalla
 ipcMain.on("registro", (e, arg)=>{
   BrowserWindow.getFocusedWindow().loadFile('app/html/registro.html')//cambiamos el html de la ventana.
 })
 
-//cuando registra un usuario volvemos al login
+//volvemos al login
 ipcMain.on("volver-login", (e, arg)=>{
   BrowserWindow.getFocusedWindow().loadFile('app/html/login.html')//cambiamos el html de la ventana.
 })
 
-//crear un usuario usuarioistrador
+//crear un usuario 
 ipcMain.on("create-usuario", async (e, arg) => {
   //const todosusuarios = usuario.find();
   console.log(arg);
@@ -41,11 +49,15 @@ ipcMain.on("create-usuario", async (e, arg) => {
   e.reply("new-usuario-created", JSON.stringify(usuarioSaved));
 });
 
-//LOGIN
+/* ***************************************************************************************************
+*********************************** LOGIN  ********************************************************
+*****************************************************************************************************/
+//comprobar si existe, en caso afirmativo reenviamos al usuario al home
 ipcMain.on("login", async (e, arg) => {
   const usuario = new Usuario (arg);//usuario recibido por el form
   //llamada a la api
   //const request = net.request('http://127.0.0.1:8080/usuarios/getLogin/'+usuario.nombre +'/'+usuario.contrasena+'/'+usuario.rol)
+  //llamada a la api
   const request = net.request({ 
     method: 'GET', 
     protocol: 'http:', 
@@ -54,7 +66,7 @@ ipcMain.on("login", async (e, arg) => {
     path: '/usuarios/getLogin/'+usuario.nombre +'/'+usuario.contrasena+'/'+usuario.rol,
     
   }); 
-
+  //respuesta de la llamada a la api
   request.on('response', (response) => {
     console.log(`STATUS: ${response.statusCode}`);
     response.on('error', (error) => {
@@ -63,9 +75,10 @@ ipcMain.on("login", async (e, arg) => {
     })
     //cogemos la data 
     response.on('data', (chunk) => {
-      if(typeof JSON.parse(chunk)[0] !== 'undefined'){
+      if(typeof JSON.parse(chunk)[0] !== 'undefined'){//si nos devuelve un usuario será que existe
         idUsuarioConectado=JSON.parse(chunk)[0]['id'] 
         console.log( JSON.parse(chunk)[0]);
+        //cambiamos el estado de 'conectado' del usuario a activo
         const request = net.request({ 
           method: 'PUT', 
           protocol: 'http:', 
@@ -87,13 +100,43 @@ ipcMain.on("login", async (e, arg) => {
       console.log('No more data in response.')
     })
   })
-  request.end()
+  request.end()//fin de la request
   
 });
 
 
+/* ***************************************************************************************************
+*********************************** LOGOUT  ********************************************************
+*****************************************************************************************************/
+ipcMain.on("exit", async (e, arg) => {
+  console.log(idUsuarioConectado);
+  const request = net.request({ 
+    method: 'PUT', 
+    protocol: 'http:', 
+    hostname: '127.0.0.1', 
+    port: 8080,
+    path: 'usuarios/desconectarUsuario/'+ idUsuarioConectado   
+  }); 
+  request.end()
+  idUsuarioConectado="";
+  //console.log("LOGOUT");
+  BrowserWindow.getFocusedWindow().loadFile('app/html/login.html')//cambiamos el html de la ventana.
+});
+
+
+/* ***************************************************************************************************
+***************************************** GENERALES  *************************************************
+*****************************************************************************************************/
+//volver al home desde x pantalla
+ipcMain.on("volver-home", async (e, arg) => {
+  BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
+});
+
+/****************************************************************************************************
+*********************************** HOME  ********************************************************
+*****************************************************************************************************/
+//obtener todas las rutas
 ipcMain.on("get-rutas", async (e, arg) => {
-/*
   //const request = net.request({method:'delete',path:'http://127.0.0.1:8080/rutas/getAll'})
   request = await net.request({ 
     method: 'GET', 
@@ -104,12 +147,13 @@ ipcMain.on("get-rutas", async (e, arg) => {
   }); 
 
   request.on('response',  (response) => {
-    //await delay(3000);
+    
     //cogemos la data 
     response.on('data',async (chunk) => {
+      
       try{
         //variables inicializadas limpias
-        chunkString=null;
+        /*chunkString=null;
         datos="";
         rutas=[];
         
@@ -121,27 +165,28 @@ ipcMain.on("get-rutas", async (e, arg) => {
         datos= JSON.parse(chunkString);
       //  console.log("---------------------------------\nDATOS\n---------------------------------\n" + datos + " - " + datos.length);
 
-        rutas = JSON.stringify(datos);
+        rutas = JSON.stringify(datos);*/
       //  console.log("---------------------------------\nARRAY RUTAS\n---------------------------------\n" + rutas);
-        e.reply("get-rutas", JSON.stringify(datos));//pasamos las rutas al app.js
+        var rutas = JSON.stringify(JSON.parse(chunk));
+        e.reply("get-rutas",rutas);//pasamos las rutas al app.js  para mostrar
       }catch(SyntaxError){
         console.log("el puto error");
         await delay(2000);
-        BrowserWindow.getFocusedWindow().reload();
+        BrowserWindow.getFocusedWindow().reload();//recargamos la pagina para que vuelva ha hacer la llamda
         //BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
       }
     }
   )}); 
   request.end();
 
-  */
+  /*
   //SIN LLAMADA A API PERO VA BIEN --> si usamos esto en el home los botones edit/delete tienen que coger el _id no id
   const rutas = await Ruta.find();
  // console.log("RUTAS FIND " + rutas);
-  e.reply("get-rutas", JSON.stringify(rutas));//pasamos las rutas al app.js
+  e.reply("get-rutas", JSON.stringify(rutas));//pasamos las rutas al app.js*/
   
 });
-
+//eliminar ruta seleccionada
 ipcMain.on("delete-ruta", async (e, args) => {
   //const rutaDeleted = await Ruta.findByIdAndDelete(args);
   //console.log("delete " + args);
@@ -163,9 +208,10 @@ ipcMain.on("delete-ruta", async (e, args) => {
   })
   request.end()
   //BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
-  BrowserWindow.getFocusedWindow().reload();
+  BrowserWindow.getFocusedWindow().reload();//recargamos la página
 });
 
+//Filtros de busqueda, obtener rutas por ciudad
 ipcMain.on("buscar", async (e, arg) => {
   const request = net.request('http://127.0.0.1:8080/rutas/getCiudad/'+arg)
   request.on('response', (response) => {
@@ -182,38 +228,17 @@ ipcMain.on("buscar", async (e, arg) => {
   request.end()
 });
 
-ipcMain.on("exit", async (e, arg) => {
-  console.log(idUsuarioConectado);
-  const request = net.request({ 
-    method: 'PUT', 
-    protocol: 'http:', 
-    hostname: '127.0.0.1', 
-    port: 8080,
-    path: 'usuarios/desconectarUsuario/'+ idUsuarioConectado   
-  }); 
-  request.end()
-  idUsuarioConectado="";
-  //console.log("LOGOUT");
-  BrowserWindow.getFocusedWindow().loadFile('app/html/login.html')//cambiamos el html de la ventana.
-});
 
+/* ***************************************************************************************************
+***************************** FORMULARIO DE CREACION ***********************************************
+*****************************************************************************************************/
 //ir al form de crear ruta
 ipcMain.on("create-ruta-form", async (e, arg) => {
   BrowserWindow.getFocusedWindow().loadFile('app/src/nuevo/nuevoForm.html')//cambiamos el html de la ventana.
 });
 
-//ir al form de editar ruta
-ipcMain.on("edit-ruta-form", async (e, arg) => {
-  console.log("vamos al form edit");
-  console.log(arg);
-  BrowserWindow.getFocusedWindow().loadFile('app/src/editar/editForm.html')//cambiamos el html de la ventana.
-});
 
-ipcMain.on("volver-home", async (e, arg) => {
-  BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
-});
-
-//crear ruta
+//CREAR RUTA
 ipcMain.on("crear-ruta", async (e, arg) => {
   var elBody = JSON.stringify(arg);
  // console.log("crear Ruta " + JSON.parse(elBody));
@@ -227,106 +252,181 @@ ipcMain.on("crear-ruta", async (e, arg) => {
       'Content-Type': 'application/json'
     }, 
   }); 
-  //obtener id ruta
   request.on('response', (response) => {
-    //cogemos la data 
+    
     response.on('data', (chunk) => {
-  //    console.log('RUTA ' + JSON.parse(chunk));
+      //console.log('RUTA ' + JSON.parse(chunk));
     })
   })
-  request.write(elBody);
+  request.write(elBody);//enviamos el body
   request.end();
 });
-//funcion obtener id ultima ruta
+
+
+//crear las localizaciones de la ruta
+ipcMain.on("crear-localizacion", (e, arg) => {
+  //llamamos a la funcion para obtener la id de la última ruta creada
+  obtenerIdRuta(arg);
+});
+
+//funcion obtener id ultima ruta (la recien creada)
 async function obtenerIdRuta(localizacion){
- // console.log("obtener ultima id ");
-  var idRuta="";//var id
+  // console.log("obtener ultima id ");
+   var idRuta="";//var id
+   const request = await net.request({ 
+     method: 'GET', 
+     protocol: 'http:', 
+     hostname: '127.0.0.1', 
+     port: 8080,
+     path: '/rutas/getUltimaRuta'    
+   }); 
+   request.on('response', (response) => {
+     //cogemos la data 
+     response.on('data',async (chunk) => {
+       var ruta=JSON.parse(chunk);
+       idRuta=ruta['id'];//actualizamos la variable con el valor de la id
+       crearLocalizacion(idRuta, localizacion);//llamamos a la funcion para crear la localizacion con la id y la localizacion actual
+     })
+   })
+   request.end();
+ }
+
+ //funcion crear localizacion X
+ async function crearLocalizacion(idruta, localizacion){
+   console.log(localizacion);
+   //recorremos el array de localizaciones para obtener un json de uno en uno 
+   for(let i=0; i< localizacion.length; i++){
+     var elBody = JSON.stringify(localizacion[i]);//obtenemos el obj localizacion
+     
+     var json=JSON.parse(elBody);//creamos un json con el obj
+     json.rutaId=idruta;//modificamos el key 'rutaId'
+    //console.log(json);
+     elBody=JSON.stringify(json);//volvemos a asignar al body los datos
+     console.log("EL BODY " + elBody);
+ 
+     //hacemos la llamada mandando el body
+     const request = net.request({ 
+       method: 'POST', 
+       protocol: 'http:', 
+       hostname: '127.0.0.1', 
+       port: 8080,
+       path: '/localizaciones/add',
+       headers: {
+         'Content-Type': 'application/json'
+       },   
+     }); 
+     request.on('response', (response) => {
+       //cogemos la data 
+       response.on('data', (chunk) => {
+         console.log('localizacion ' + JSON.parse(chunk));
+       })
+     })
+     request.write(elBody);
+     request.end();
+     
+   }
+  // await delay(5000);
+   actualizarDatos(idruta);//funcion para actualizar la lista de localizaciones de la ruta
+ }
+
+ //actualizar la lista de localizaciones de la ruta con id X
+ function actualizarDatos(id){
+  // console.log("id " + id);
+   const request = net.request({ 
+     method: 'PUT', 
+     protocol: 'http:', 
+     hostname: '127.0.0.1', 
+     port: 8080,
+     path: '/rutas/editIdListado/'+id,
+     headers: {
+       'Content-Type': 'application/json'
+     },   
+   }); 
+   request.on('response', (response) => {
+     response.on('data', (chunk) => {
+       console.log("datos actualizados");
+     })
+   })
+   request.end();
+ }
+ 
+
+/* ***************************************************************************************************
+***************************** FORMULARIO DE EDICION  ***********************************************
+*****************************************************************************************************/
+
+//ir al form de editar ruta
+ipcMain.on("edit-ruta-form", async (e, arg) => {
+  var ruta;
+  console.log("vamos al form edit");
+  console.log(arg);
+  //obtener la ruta a editar por su id
   const request = await net.request({ 
     method: 'GET', 
     protocol: 'http:', 
     hostname: '127.0.0.1', 
     port: 8080,
-    path: '/rutas/getUltimaRuta'    
+    path: '/rutas/getId/'+arg    
   }); 
   request.on('response', (response) => {
     //cogemos la data 
     response.on('data',async (chunk) => {
-      var ruta=JSON.parse(chunk);
-      idRuta=ruta['id'];//actualizamos la variable con el valor de la id
-      crearLocalizacion(idRuta, localizacion);//llamamos a la funcion para crear la localizacion con la id y la localizacion actual
+      ruta=JSON.stringify(JSON.parse(chunk));
+      console.log("r " + ruta);
+      rutaEdit=ruta; //cambiamos la variable global
+      BrowserWindow.getFocusedWindow().loadFile('app/src/editar/editForm.html')//cambiamos el html de la ventana.
     })
   })
   request.end();
-}
-//funcion crear localizacion
-async function crearLocalizacion(idruta, localizacion){
-  console.log(localizacion);
-  //recorremos el array de localizaciones para obtener un json de uno en uno 
-  for(let i=0; i< localizacion.length; i++){
-    var elBody = JSON.stringify(localizacion[i]);//obtenemos el obj localizacion
-    
-    var json=JSON.parse(elBody);//creamos un json con el obj
-    json.rutaId=idruta;//modificamos el key 'rutaId'
-   //console.log(json);
-    elBody=JSON.stringify(json);//volvemos a asignar al body los datos
-    console.log("EL BODY " + elBody);
-    /*var p=[];
-    p = JSON.parse(elBody['pregunta']);
+  
+});
+//enviar los datos para editar
+ipcMain.on('obtener-datos-editar',(e)=>{
+  e.reply('datos-edit', rutaEdit);
+})
 
-    console.log("PREGUNTA " + p );
-    elBody['pregunta']=JSON.parse(p);
-    console.log("EL BODY2 " + elBody);*/
-
-
-    //hacemos la llamada mandando el body
-    const request = net.request({ 
-      method: 'POST', 
+/*
+//hacer el update de los datos
+ipcMain.on("editar-datos", (e,arg)=>{
+  var elBody = JSON.stringify(arg);
+  var localizacion = elBody['listaLocalizaciones'];
+  //update de las localizaciones
+  for(let i=0 ; i<localizacion.length; i++){
+     const request = await net.request({ 
+      method: 'PUT', 
       protocol: 'http:', 
       hostname: '127.0.0.1', 
       port: 8080,
-      path: '/localizaciones/add',
-      headers: {
-        'Content-Type': 'application/json'
-      },   
+      path: '/localizaciones/editId/'+localizacion[i].id    
     }); 
     request.on('response', (response) => {
       //cogemos la data 
-      response.on('data', (chunk) => {
-        console.log('localizacion ' + JSON.parse(chunk));
+      response.on('data',async (chunk) => {
+        
       })
     })
-    request.write(elBody);
+    request.write(localizacion[i]);
     request.end();
-    
   }
- // await delay(5000);
-  actualizarDatos(idruta);//funcion para actualizar la lista de localizaciones de la ruta
-}
-//actualizar la lista de localizaciones de la ruta con id X
-function actualizarDatos(id){
- // console.log("id " + id);
-  const request = net.request({ 
+
+  //update de la ruta
+  const request = await net.request({ 
     method: 'PUT', 
     protocol: 'http:', 
     hostname: '127.0.0.1', 
     port: 8080,
-    path: '/rutas/editIdListado/'+id,
-    headers: {
-      'Content-Type': 'application/json'
-    },   
+    path: '/rutas/editId/'+elBody.id    
   }); 
   request.on('response', (response) => {
-    response.on('data', (chunk) => {
-      console.log("datos actualizados");
+    //cogemos la data 
+    response.on('data',async (chunk) => {
+      BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
     })
   })
+  request.write(elBody);
   request.end();
-}
-
-//crear localizacion
-ipcMain.on("crear-localizacion", (e, arg) => {
-  //llamamos a la funcion para obtener la id de la última ruta creada
-  obtenerIdRuta(arg);
 });
+*/
+
 
 module.exports = { createWindow };

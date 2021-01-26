@@ -1,10 +1,12 @@
-const {ipcRenderer } = require("electron");
+const {ipcRenderer, remote } = require("electron");
 
 const formLogin = document.querySelector("#form");
 const nick = document.querySelector("#nick");
 const password = document.querySelector("#pwd");
 
 const rutaRegistro = document.querySelector("#rutaRegistro");
+const btnExit = document.querySelector("#exit");
+
 //cuando envia los datos del form 
 formLogin.addEventListener('submit', e => {
   e.preventDefault(); 
@@ -36,3 +38,9 @@ ipcRenderer.on('new-usuario-created', (e, args)=>{
 ipcRenderer.on("login-error", (e,args)=>{
   document.getElementById("msg").innerHTML=args;
 })
+
+//exit
+btnExit.addEventListener('click', e => {
+  var window = remote.getCurrentWindow();
+  window.close();
+});

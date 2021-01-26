@@ -106,3 +106,8 @@ btnAdd.addEventListener('click', e => {
     ipcRenderer.send("create-ruta-form");
 });
   
+ipcRenderer.on('edit-ruta', (e, args) => {
+    console.log("editar ruta " + args);
+    var ruta = JSON.parse(args);
+    console.log(ruta['nombre']);
+  });

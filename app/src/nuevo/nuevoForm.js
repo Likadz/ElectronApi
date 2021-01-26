@@ -109,7 +109,7 @@ var placesAutocomplete = places({
     //ESCRBIR PREGUNTA C
 
     $("#div"+numLocalizaciones+" .subdiv").append("Pregunta C:<p><input id='preguntaC"+numLocalizaciones+"' placeholder='Pregunta C' oninput=''></p> ");
-
+ 
     //ESCRBIR IMAGEN
 
     $("#div"+numLocalizaciones+" .subdiv").append("Imagen:<p><input id='imagenPregunta"+numLocalizaciones+"' type='file' ></p>");
@@ -121,8 +121,8 @@ var placesAutocomplete = places({
 
     //ELEGIR RESPUESTA CORRECTA
 
-    $("#div"+numLocalizaciones+" .subdiv").append("Respuesta correcta:    <p><select id='respuestaPregunta"+numLocalizaciones+"' class='form-select' aria-label='Default select example'> <option selected>selecciona la respuesta correcta</option>  <option value='1'>A</option>      <option value='2'>B</option>      <option value='3'>C</option>  </select></p>");
-    //$("#div"+numLocalizaciones+" .subdiv").append(`Respuesta correcta:    <p><select id='respuestaPregunta"+numLocalizaciones+"' class='form-select' aria-label='Default select example'> <option selected>selecciona la respuesta correcta</option>  <option value='1'>A</option>      <option value='2'>B</option>      <option value='3'>C</option>  </select></p>` );
+    //$("#div"+numLocalizaciones+" .subdiv").append("Respuesta correcta:    <p><select id='respuestaPregunta"+numLocalizaciones+"' class='form-select' aria-label='Default select example'> <option selected>selecciona la respuesta correcta</option>  <option value='1'>A</option>      <option value='2'>B</option>      <option value='3'>C</option>  </select></p>");
+    $("#div"+numLocalizaciones+" .subdiv").append(`Respuesta correcta:<p><select id='respuestaPregunta${numLocalizaciones}' name='respuestaPregunta${numLocalizaciones}' class='form-select' aria-label='Default select example'><option selected>selecciona la respuesta correcta</option><option value='1'>A</option><option value='2'>B</option><option value='3'>C</option></select></p>` );
 
     $("#div"+numLocalizaciones+" .subdiv").hide();
     $("#div0 .subdiv").show();
@@ -286,7 +286,6 @@ function recogerYEnviar(){
  // console.log($('#accordeonPreguntas div').even().length);
  
   for (i = 0; i < $('#accordeonPreguntas div').even().length; i++){
-    console.log($( "#respuetaPregunta"+i +" option:selected").text());
     var JSONPregunta = {
       "pregunta" :  $("#descripcionPregunta"+i).val(),
       "respuesta1" : $("#preguntaA"+i).val(),
@@ -294,7 +293,7 @@ function recogerYEnviar(){
       "respuesta3" : $("#preguntaC"+i).val(),
       "imagen" : $("#imagenPregunta"+i).val(),
       "tipo" : "pregunta",
-      "correcta" :$( "#respuetaPregunta"+i).val(),
+      "correcta" :$( "#respuestaPregunta"+i).val(),
       
     }
     /*console.log("PREGUNTA DATOS "+ JSON.stringify(JSONPregunta));
@@ -320,6 +319,6 @@ function recogerYEnviar(){
   
 
   //volvemos al home
-  //ipcRenderer.send("volver-home");
+  ipcRenderer.send("volver-home");
       
 }

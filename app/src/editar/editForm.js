@@ -1,4 +1,25 @@
+const { ipcMain } = require("electron");
+const {ipcRenderer } = require("electron");
 //import L from 'leaflet';
+
+//campos del formulario
+const nombre = document.querySelector("input[name='nombre']");
+const descripcion = document.querySelector("#descripcion");
+
+//pedimos los datos
+ipcRenderer.send('obtener-datos-editar');
+//rellenamos el formulario
+ipcRenderer.on('datos-edit', (e, args) => {
+  var ruta = JSON.parse(args);
+  nombre.value=ruta['nombre'];
+  descripcion.value=ruta['descripcion'];
+  document.querySelector("#ciudadRuta option[value="+ruta['ciudad']+"]").attributes('selected','selected');
+  document.querySelector("#transporteRuta option[value="+ruta['transporte']+"]").attributes('selected','selected');
+  document.querySelector("#tematicaRuta option[value="+ruta['tematica']+"]").attributes('selected','selected');
+  //document.querySelector("#dificultad [value="+ruta['dificultad']+"]").prop('checked', true);
+});
+
+
 
 var currentTab = 0; // Current tab is set to be the first tab (0)
 showTab(currentTab); // Display the current tab
@@ -94,3 +115,5 @@ function fixStepIndicator(n) {
   x[n].className += " active";
 }
 
+//hacer el update
+ipcRenderer.send("editar-datos",rutaJSON);
