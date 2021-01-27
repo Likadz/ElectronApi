@@ -47,7 +47,7 @@ var placesAutocomplete = places({
         map.setView([suggestion.latlng.lat,suggestion.latlng.lng],15);
     }
   },
-  });
+});
 
   placesAutocomplete.on('change', e => {
     map.setView([e.suggestion.latlng.lat,e.suggestion.latlng.lng],15);

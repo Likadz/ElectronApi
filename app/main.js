@@ -43,10 +43,10 @@ ipcMain.on("volver-login", (e, arg)=>{
 //crear un usuario 
 ipcMain.on("create-usuario", async (e, arg) => {
   //const todosusuarios = usuario.find();
-  console.log(arg);
+  //console.log(arg);
   const newusuario = new Usuario(arg);
   const usuarioSaved = await newusuario.save();
-  console.log(usuarioSaved);
+  //console.log(usuarioSaved);
   e.reply("new-usuario-created", JSON.stringify(usuarioSaved));
 });
 
@@ -69,16 +69,16 @@ ipcMain.on("login", async (e, arg) => {
   }); 
   //respuesta de la llamada a la api
   request.on('response', (response) => {
-    console.log(`STATUS: ${response.statusCode}`);
+   // console.log(`STATUS: ${response.statusCode}`);
     response.on('error', (error) => {
-      console.log(`ERROR: ${JSON.stringify(error)}`)
+     // console.log(`ERROR: ${JSON.stringify(error)}`)
       e.reply("login-error","EL USUARIO O CONTRASEnA SON INCORRECTOS");
     })
     //cogemos la data 
     response.on('data', (chunk) => {
       if(typeof JSON.parse(chunk)[0] !== 'undefined'){//si nos devuelve un usuario será que existe
         idUsuarioConectado=JSON.parse(chunk)[0]['id'] 
-        console.log( JSON.parse(chunk)[0]);
+       // console.log( JSON.parse(chunk)[0]);
         //cambiamos el estado de 'conectado' del usuario a activo
         const request = net.request({ 
           method: 'PUT', 
@@ -92,13 +92,13 @@ ipcMain.on("login", async (e, arg) => {
         BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
       }else{
         e.reply("login-error","EL USUARIO O CONTRASEnA SON INCORRECTOS");
-        console.log("EL USUARIO O CONTRASEnA SON INCORRECTOS");
+        //console.log("EL USUARIO O CONTRASEnA SON INCORRECTOS");
       }
       
     })
     //para saber que ha acabado.
     response.on('end', () => {
-      console.log('No more data in response.')
+     // console.log('No more data in response.')
     })
   })
   request.end()//fin de la request
@@ -110,7 +110,7 @@ ipcMain.on("login", async (e, arg) => {
 ************************************* LOGOUT  ********************************************************
 *****************************************************************************************************/
 ipcMain.on("exit", async (e, arg) => {
-  console.log(idUsuarioConectado);
+  //console.log(idUsuarioConectado);
   const request = net.request({ 
     method: 'PUT', 
     protocol: 'http:', 
@@ -165,10 +165,10 @@ ipcMain.on("get-rutas", async (e, arg) => {
           rutas.push(otro[i]);
         }
        
-       console.log(rutas)
+       //console.log(rutas)
         e.reply("get-rutas",JSON.stringify(rutas));//pasamos las rutas al app.js  para mostrar
       }catch(SyntaxError){
-        console.log("el puto error");
+        //console.log("el puto error");
         await delay(2000);
         BrowserWindow.getFocusedWindow().reload();//recargamos la pagina para que vuelva ha hacer la llamda
       }
@@ -200,7 +200,7 @@ ipcMain.on("delete-ruta", async (e, args) => {
   request.on('response', (response) => {
     //cogemos la data 
     response.on('data', (chunk) => {
-     console.log("ELIMINAR ruta" + JSON.stringify(chunk));
+    // console.log("ELIMINAR ruta" + JSON.stringify(chunk));
     })
   })
   request.end()
@@ -221,16 +221,16 @@ ipcMain.on("buscar", async (e, arg) => {
       var stringifyChunk=JSON.stringify(sChunk);
       //console.log(stringifyChunk);
       var jsonData = JSON.parse(stringifyChunk);
-      console.log("JSON DATA\n" + jsonData + "\nLENGTH " + jsonData.length);
+     // console.log("JSON DATA\n" + jsonData + "\nLENGTH " + jsonData.length);
 
       var otro = JSON.parse(jsonData);
-      console.log("OTRO\n" + otro.length);
+      //console.log("OTRO\n" + otro.length);
       for(let i = 0; i< otro.length; i++){
         rutas.push(new Ruta(otro[i]));//por cada elemento de la data parseada creamos un usuario en el array
-        console.log(otro[i]['imagen']);
+       // console.log(otro[i]['imagen']);
         //rutas.push(otro[i]);
       }
-      console.log(rutas);
+     // console.log(rutas);
       e.reply("busqueda-realizada", JSON.stringify(rutas));//pasamos las rutas al app.js
 
     })
@@ -303,7 +303,7 @@ async function obtenerIdRuta(localizacion){
 
  //funcion crear localizacion X
  async function crearLocalizacion(idruta, localizacion){
-   console.log(localizacion);
+   //console.log(localizacion);
    //recorremos el array de localizaciones para obtener un json de uno en uno 
    for(let i=0; i< localizacion.length; i++){
      var elBody = JSON.stringify(localizacion[i]);//obtenemos el obj localizacion
@@ -312,7 +312,7 @@ async function obtenerIdRuta(localizacion){
      json.rutaId=idruta;//modificamos el key 'rutaId'
     //console.log(json);
      elBody=JSON.stringify(json);//volvemos a asignar al body los datos
-     console.log("EL BODY " + elBody);
+     //console.log("EL BODY " + elBody);
  
      //hacemos la llamada mandando el body
      const request = net.request({ 
@@ -328,7 +328,7 @@ async function obtenerIdRuta(localizacion){
      request.on('response', (response) => {
        //cogemos la data 
        response.on('data', (chunk) => {
-         console.log('localizacion ' + JSON.parse(chunk));
+         //console.log('localizacion ' + JSON.parse(chunk));
        })
      })
      request.write(elBody);
@@ -354,7 +354,7 @@ async function obtenerIdRuta(localizacion){
    }); 
    request.on('response', (response) => {
      response.on('data', (chunk) => {
-       console.log("datos actualizados");
+       //console.log("datos actualizados");
      })
    })
    request.end();
@@ -380,9 +380,13 @@ ipcMain.on("edit-ruta-form", async (e, arg) => {
   request.on('response', (response) => {
     //cogemos la data 
     response.on('data',async (chunk) => {
-      ruta=JSON.stringify(JSON.parse(chunk));
-      console.log("r " + ruta);
-      rutaEdit=ruta; //cambiamos la variable global
+     
+      ruta=JSON.parse(JSON.parse(JSON.stringify(chunk.toString('utf8'))));
+      //console.log("r " + ruta['listaLocalizaciones']);
+      rutaEdit=ruta; //cambiamos la variable 
+      //get localizaciones
+     // var localizacionEdit = rutaEdit['listaLocalizaciones'];
+      
       BrowserWindow.getFocusedWindow().loadFile('app/html/formEditRuta.html')//cambiamos el html de la ventana.
     })
   })
@@ -390,16 +394,45 @@ ipcMain.on("edit-ruta-form", async (e, arg) => {
   
 });
 //enviar los datos para editar
-ipcMain.on('obtener-datos-editar',(e)=>{
+ipcMain.on('obtener-datos-editar',async (e)=>{
   //falta mandar tambien la localizacion para editar
-  e.reply('datos-edit', rutaEdit);
+  //console.log(JSON.stringify(rutaEdit['listaLocalizaciones']));
+  localizacionEdit=rutaEdit['listaLocalizaciones'];
+  //console.log(localizacionEdit['id']);
+  for(let i = 0; i<localizacionEdit.length; i++){
+    console.log("en el for " + localizacionEdit[i]['id']   );
+    const request = await net.request({ 
+      method: 'GET', 
+      protocol: 'http:', 
+      hostname: '127.0.0.1', 
+      port: 8080,
+      path: '/localizaciones/getId/'+localizacionEdit[i]['id']    
+    }); 
+    request.on('response', (response) => {
+      //cogemos la data 
+      response.on('data',async (chunk) => {
+      
+        ruta=JSON.parse(JSON.parse(JSON.stringify(chunk.toString('utf8'))));
+        localizacionEdit.push(ruta); //cambiamos la variable 
+       
+      })
+    })
+    request.end();
+  }
+ 
+  e.reply('datos-edit', JSON.stringify(rutaEdit), JSON.stringify(localizacionEdit));
 })
 
-/*
+
 //hacer el update de los datos
-ipcMain.on("editar-datos", (e,arg)=>{
-  var elBody = JSON.stringify(arg);
-  var localizacion = elBody['listaLocalizaciones'];
+ipcMain.on("editar-datos",async (e,arg)=>{
+  var elBody = JSON.parse(JSON.stringify(arg));
+  
+  var idR=elBody['id'];//id de la ruta
+  var pathRuta=`/rutas/editId/${idR}`;//path update ruta
+  var bodyRuta=JSON.stringify(elBody);//el body que pasamos al update de la ruta
+  console.log("HAGAMOS EL UPDATE DE " +  bodyRuta);
+  /*var localizacion = elBody['listaLocalizaciones'];
   //update de las localizaciones
   for(let i=0 ; i<localizacion.length; i++){
      const request = await net.request({ 
@@ -417,7 +450,7 @@ ipcMain.on("editar-datos", (e,arg)=>{
     })
     request.write(localizacion[i]);
     request.end();
-  }
+  }*/
 
   //update de la ruta
   const request = await net.request({ 
@@ -425,18 +458,18 @@ ipcMain.on("editar-datos", (e,arg)=>{
     protocol: 'http:', 
     hostname: '127.0.0.1', 
     port: 8080,
-    path: '/rutas/editId/'+elBody.id    
+    path: pathRuta,
+    headers: {
+      'Content-Type': 'application/json'
+    },  
+    body: bodyRuta
   }); 
-  request.on('response', (response) => {
-    //cogemos la data 
-    response.on('data',async (chunk) => {
-      BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
-    })
-  })
-  request.write(elBody);
+ 
+  //request.write(bodyRuta, 'utf-8');
   request.end();
+  BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
 });
-*/
+
 
 
 module.exports = { createWindow };
