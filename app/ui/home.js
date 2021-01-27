@@ -49,8 +49,8 @@ function renderrutas(rutas) {
                     <p class="card-text">Dificultad: ${r.dificultad} </p>
                     <div class="d-flex justify-content-between align-items-center">
                     <div class="btn-group">
-                        <button class="btn btn-danger" onclick="deleteruta('${r._id}')">🗑 Delete</button>
-                        <button class="btn btn-secondary" onclick="editruta('${r._id}')">✎ Edit</button>
+                        <button class="btn btn-danger" onclick="deleteruta('${r.id}')">🗑 Delete</button>
+                        <button class="btn btn-secondary" onclick="editruta('${r.id}')">✎ Edit</button>
                     </div>
                     </div>
                 </div>

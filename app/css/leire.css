@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 /* GENERAL*/
 xbody{
     background-image:   url(./resources/fondo_vectorizado.jpg) ;
@@ -6,18 +7,21 @@ xbody{
     align-content: center;
     
 }
+*{
+    font-family: 'Roboto', sans-serif;
+}
 body:before {
     content: '';
     position: fixed;
     width: 100vw;
     height: 100vh;
-    background-image:  url(../resources/fondo_vectorizado.jpg);
+    background-image:  url(../resources/google-maps-nedir.jpg);
     background-position: center center;
     background-repeat: no-repeat;
     background-position: 100% 100%;
     background-size: cover;
     xfilter: blur(2px);
-    filter: opacity(35%);
+    filter: opacity(75%);
     z-index: -9;
 }
 /* LOGIN */
@@ -33,6 +37,7 @@ body:before {
     width: 40%;
     padding: 20px;
     text-align: center;
+    
 }
 #form, #formRegistro{
     background-color: rgb(0,0,0); /* Fallback color */
@@ -70,6 +75,10 @@ input[type=submit]{
 }
 
 /* HOME */
+h1{
+    padding: 2%;
+    xtext-shadow: 2px 2px 10px rgba(64, 140, 255, 0.589);
+}
 /* container parte superior home*/
 #containerSup{
     display: flex;
@@ -82,7 +91,6 @@ input[type=submit]{
 
 /* container filtros del home */
 #containerFiltros{
-   
     justify-content: space-around;
     background-color: rgb(0,0,0); /* Fallback color */
     background-color: rgba(0,0,0, 0.4); /* Black w/opacity/see-through */
@@ -98,12 +106,13 @@ input[type=submit]{
     border-radius: 10px;
     color: #000000;
     background-color: aliceblue;
-    width: 30%;
-    xpadding: 1%;
+    font-size: 20px;
+    width: 200px;
+    padding: 1%;
 }
 .bonito:hover {
-    box-shadow: 0 5px 15px rgba(149, 0, 255, 0.74);
-  }
+    box-shadow:2px 2px 15px rgb(64, 140, 255);
+}
 
 #containerFiltros>form{
     display: flex;
@@ -121,6 +130,7 @@ input[type=submit]{
     position: fixed;
     bottom:10px;
     right: 10px;
+    
 }
 /*#btnAdd{
     background-color: rgb(54, 54, 54);
@@ -142,7 +152,7 @@ input[type=submit]{
     margin-top: 2%;
     background-color: rgba(255, 255, 255, 0.904); /* Black w/opacity/see-through */
     border-radius: 50%;
-    border: solid 5px rgba(255, 73, 73, 0.534);
+    border: solid 5px rgba(255, 83, 83, 0.534);
 }
 .exit{
     width: 100px;
@@ -168,17 +178,18 @@ input[type=submit]{
 }
 #imgVolver{
     margin: 2%;
-    background-color: rgba(255, 255, 255, 0.904); /* Black w/opacity/see-through */
+    xbackground-color: rgba(255, 255, 255, 0.904); /* Black w/opacity/see-through */
     border-radius: 50%;
     padding: 1%;
-    border: solid 5px rgba(255, 73, 73, 0.534);
+    xborder: solid 5px rgba(75, 75, 75, 0.534);
 }
 #imgChat{
-   background: rgb(255,255,255);
-    background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(162,162,162,1) 100%);
+    background: rgb(255, 255, 255);
+    xbackground: radial-gradient(circle, rgba(255,255,255,1) 0%, rgb(51, 51, 51) 100%);
     border-radius: 50%;
     xpadding: 1%;
     border: solid 5px rgb(156, 219, 255);
+    width: 5%;
 }
 
 /*LOADING*/

@@ -9,108 +9,94 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
     integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
     crossorigin=""/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
+
 <body>
+  <img src="../resources/back-arrow.png" id="btnBack">
+  <div id="container">
     <form id="regForm" action="">
         <h1 id="titulo">Nueva Ruta</h1>
         <!-- One "tab" for each step in the form: -->
         <!-- NUEVA RUTA -->
         <div class="tab">
             Nombre de la ruta:
-            <input placeholder="Nombre de la ruta" oninput="this.className = '' " ></p>
+            <input id="nombreRuta" placeholder="Nombre de la ruta" oninput="this.className = '' " ></p>
             Descripcion:
-            <p><textarea placeholder="Descripcion" name="" id="" style="resize: none; overflow: auto;"></textarea></p>
+            <p><textarea id="descripcionRuta" placeholder="Descripcion" name=""  style="resize: none; overflow: auto;"></textarea></p>
             Imagen:
-            <p><input type="file"></p>
+            <p><input id="imagenRuta" type="file"></p>
 
-            <p><select class="form-select" aria-label="Default select example">
-                <option selected>Open this select menu</option>
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
+            <p><select id="ciudadRuta" class="form-select" aria-label="Default select example">
+                <option selected>Ciudad</option>
+                <option value="Andoain" >Andoain</option>
+                <option value="Donostia">Donostia</option>
+                <option value="Irun">Irun</option>
               </select></p>
 
-            <p><select class="form-select" aria-label="Default select example">
-                <option selected>Open this select menu</option>
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
+            <p><select id="transporteRuta" class="form-select" aria-label="Default select example">
+                <option selected>Transporte</option>
+                <option value="Andando">Andando</option>
+                <option value="Bici">Bici</option>
+                <option value="Coche/moto">Coche/moto</option>
             </select></p> 
 
-            <p><select class="form-select" aria-label="Default select example">
-                <option selected>Open this select menu</option>
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
+            <p><select id="tematicaRuta" class="form-select" aria-label="Default select example">
+                <option selected>Tematica</option>
+                <option value="Comida">Comida</option>
+                <option value="Turismo">Turismo</option>
+                <option value="Lugares ocultos">Lugares ocultos</option>
             </select></p>
             
             Dificultad:
-            <p class="clasificacion">
-              <input id="radio1" type="radio" name="estrellas" value="5">
-              <label for="radio1">★</label>
-              <input id="radio2" type="radio" name="estrellas" value="4">
-              <label for="radio2">★</label>
-              <input id="radio3" type="radio" name="estrellas" value="3">
-              <label for="radio3">★</label>
+            <p id="dificultad" class="clasificacion">
+              <input id="dificultadRuta1" type="radio" name="estrellas" value="3">
+              <label for="dificultadRuta1">★</label>
+              <input id="dificultadRuta2" type="radio" name="estrellas" value="2">
+              <label for="dificultadRuta2">★</label>
+              <input id="dificultadRuta3" type="radio" name="estrellas" value="1">
+              <label for="dificultadRuta3">★</label>
             </p>
 
         </div>
 
+
         <!-- NUEVA LOCALIZACION -->
         <div class="tab">
           <div id="searchBar">
-            <p><input placeholder="Adress" oninput="this.className = ''" type="text"></p>
-            <button type="button"><i class="fa fa-search"></i></button>
+            <p><input type="search" id="nombreLocalizacion" oninput="this.className = ''" placeholder="Where are we going?" /><button type="button" id="botonBuscar" class="btn btn-primary" onclick="nuevaLocalizacion()">Buscar</button></p>
           </div>
-          <div>
           <div id="mapid"></div>
           <table class="table" id="localizacionesDeRuta">
             <thead>
               <tr>
-                <th scope="col">Ruta</th>
+                <th scope="col">Localizacion</th>
                 <th scope="col"></th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <th scope="row">Ruta 1</th>
-                <td>
-                  <Button type="button"><i class="fas fa-eraser"></i></Button>
-                  <Button type="button"><i class="fas fa-edit"></i></Button>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Ruta 2</th>
-                <td>
-                  <Button type="button"><i class="fas fa-eraser"></i></Button>
-                  <Button type="button"><i class="fas fa-edit"></i></Button>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Ruta 3</th>
-                <td>
-                  <Button type="button"><i class="fas fa-eraser"></i></Button>
-                  <Button type="button"><i class="fas fa-edit"></i></Button>
-                </td>
-              </tr>
             </tbody>
           </table>
-        </div>
+        </div>     
         </div>
         
+      
         <!-- PREGUNTA -->
         <div class="tab">
+
+          <div id="accordeonPreguntas"></div>
+
+         <!-- Elige una ruta:
           Descripcion:
-            <p><textarea placeholder="Descripcion" name="" id="" style="resize: none; overflow: auto;"></textarea></p>
+            <p><textarea id="descripcionPregunta" placeholder="Descripcion" name="" id="" style="resize: none; overflow: auto;"></textarea></p>
           Pregunta A:
-            <p><input placeholder="Pregunta A" oninput="this.className = '' " ></p>
+            <p><input id="preguntaA" placeholder="Pregunta A" oninput="this.className = '' " ></p>
           Pregunta B:
-            <p><input placeholder="Pregunta B" oninput="this.className = '' " ></p>
+            <p><input id="preguntaB" placeholder="Pregunta B" oninput="this.className = '' " ></p>
           Pregunta C:
-            <p><input placeholder="Pregunta C" oninput="this.className = '' " ></p>
+            <p><input id="preguntaC" placeholder="Pregunta C" oninput="this.className = '' " ></p>
           Imagen:
-            <p><input type="file"></p>
+            <p><input id="imagenPregunta" type="file"></p>
           
           <p><input type="radio" name="tipo" id="Pregunta">
           <label for="Pregunta">Pregunta</label></p>
@@ -118,20 +104,19 @@
           <label for="Localizacion">Localizacion</label></p>
 
           Respuesta correcta:
-          <p><select class="form-select" aria-label="Default select example">
-            <option selected>Open this select menu</option>
+          <p><select id="respuestaPregunta" class="form-select" aria-label="Default select example">
+            <option selected>Respuesta correcta</option>
             <option value="1">A</option>
             <option value="2">B</option>
             <option value="3">C</option>
-        </select></p>
-          
+        </select></p>-->
         </div>
 
         <!-- BOTONES -->
         <div style="overflow:auto;">
-          <div style="float:right;">
-            <button type="button" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
-            <button type="button" id="nextBtn" onclick="nextPrev(1)">Next</button>
+          <div style="float:right;margin-right: 15%; margin-top: 10px;">
+            <button type="button" id="prevBtn" class="btn btn-secondary" onclick="nextPrev(-1)">Anterior</button>
+            <button type="button" id="nextBtn" class="btn btn-primary" onclick="nextPrev(1)">Siguiente</button>
           </div>
         </div>
 
@@ -146,12 +131,14 @@
         
 </form>
 
-
+</div>
 
 </body>
 </html>
+
+<script src="https://cdn.jsdelivr.net/npm/places.js@1.19.0"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
-<script src="../css/formEdit.css"></script>
+<script src="../ui/formEditRuta.js"></script>

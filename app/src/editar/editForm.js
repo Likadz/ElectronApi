@@ -19,6 +19,13 @@ ipcRenderer.on('datos-edit', (e, args) => {
   //document.querySelector("#dificultad [value="+ruta['dificultad']+"]").prop('checked', true);
 });
 
+//VOLVER AL HOME
+const btnVolver = document.querySelector("#btnBack");
+//boton volver a home
+btnVolver.addEventListener('click', e => {
+  ipcRenderer.send("volver-home");
+});
+
 
 
 var currentTab = 0; // Current tab is set to be the first tab (0)

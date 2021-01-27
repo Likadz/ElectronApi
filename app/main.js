@@ -7,6 +7,7 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 //variables globales
 var idUsuarioConectado;
 var rutaEdit;
+var localizacionEdit;
 
 //Creacion de la ventana
 function createWindow() {
@@ -16,12 +17,12 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true
     },
-    icon:'./app/resources/logo.png'//cambiar el logo del programa
+    icon:'./app/resources/explorer.png'//cambiar el logo del programa
   });
   
   //pantalla completa
-  win.setFullScreen(true)
-  win.removeMenu();//quitar menu superior
+  //win.setFullScreen(true)
+  //win.removeMenu();//quitar menu superior
   win.loadFile("app/html/login.html");//html de
 
 }
@@ -50,7 +51,7 @@ ipcMain.on("create-usuario", async (e, arg) => {
 });
 
 /* ***************************************************************************************************
-*********************************** LOGIN  ********************************************************
+************************************** LOGIN  ********************************************************
 *****************************************************************************************************/
 //comprobar si existe, en caso afirmativo reenviamos al usuario al home
 ipcMain.on("login", async (e, arg) => {
@@ -106,7 +107,7 @@ ipcMain.on("login", async (e, arg) => {
 
 
 /* ***************************************************************************************************
-*********************************** LOGOUT  ********************************************************
+************************************* LOGOUT  ********************************************************
 *****************************************************************************************************/
 ipcMain.on("exit", async (e, arg) => {
   console.log(idUsuarioConectado);
@@ -133,12 +134,12 @@ ipcMain.on("volver-home", async (e, arg) => {
 });
 
 /****************************************************************************************************
-*********************************** HOME  ********************************************************
+*************************************** HOME  ********************************************************
 *****************************************************************************************************/
 //obtener todas las rutas
 ipcMain.on("get-rutas", async (e, arg) => {
   //const request = net.request({method:'delete',path:'http://127.0.0.1:8080/rutas/getAll'})
-  request = await net.request({ 
+    request = await net.request({ 
     method: 'GET', 
     protocol: 'http:', 
     hostname: '127.0.0.1', 
@@ -147,33 +148,29 @@ ipcMain.on("get-rutas", async (e, arg) => {
   }); 
 
   request.on('response',  (response) => {
-    
+  
     //cogemos la data 
     response.on('data',async (chunk) => {
       
       try{
-        //variables inicializadas limpias
-        /*chunkString=null;
-        datos="";
-        rutas=[];
+        let rutas=[];//array de usuarios
         
-        console.log("\nchunkString -" + chunkString + "- datos -" + datos + "- rutas -" + rutas);
-        //cambiamos los valores de las variables
-        chunkString=chunk.toString();
-      //  console.log("---------------------------\ndatos en STRING\n---------------------------------\n" + chunkString);
+        var sChunk=chunk.toString('utf8');//pasamos el buffer a strin tipo utf/
+        var stringifyChunk=JSON.stringify(sChunk);
+        var jsonData = JSON.parse(stringifyChunk);
 
-        datos= JSON.parse(chunkString);
-      //  console.log("---------------------------------\nDATOS\n---------------------------------\n" + datos + " - " + datos.length);
-
-        rutas = JSON.stringify(datos);*/
-      //  console.log("---------------------------------\nARRAY RUTAS\n---------------------------------\n" + rutas);
-        var rutas = JSON.stringify(JSON.parse(chunk));
-        e.reply("get-rutas",rutas);//pasamos las rutas al app.js  para mostrar
+        var otro = JSON.parse(jsonData);//creamos un json de los datos
+        
+        for(let i = 0; i< otro.length; i++){
+          rutas.push(otro[i]);
+        }
+       
+       console.log(rutas)
+        e.reply("get-rutas",JSON.stringify(rutas));//pasamos las rutas al app.js  para mostrar
       }catch(SyntaxError){
         console.log("el puto error");
         await delay(2000);
         BrowserWindow.getFocusedWindow().reload();//recargamos la pagina para que vuelva ha hacer la llamda
-        //BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
       }
     }
   )}); 
@@ -183,8 +180,8 @@ ipcMain.on("get-rutas", async (e, arg) => {
   //SIN LLAMADA A API PERO VA BIEN --> si usamos esto en el home los botones edit/delete tienen que coger el _id no id
   const rutas = await Ruta.find();
  // console.log("RUTAS FIND " + rutas);
-  e.reply("get-rutas", JSON.stringify(rutas));//pasamos las rutas al app.js*/
-  
+  e.reply("get-rutas", JSON.stringify(rutas));//pasamos las rutas al app.js
+*/
 });
 //eliminar ruta seleccionada
 ipcMain.on("delete-ruta", async (e, args) => {
@@ -218,11 +215,24 @@ ipcMain.on("buscar", async (e, arg) => {
     //cogemos la data 
     response.on('data', (chunk) => {
       let rutas=[];//array de usuarios
-      for(let i = 0; i< JSON.parse(chunk).length; i++){
-        rutas.push(new Ruta(JSON.parse(chunk)[i]));//por cada elemento de la data parseada creamos un usuario en el array
-      }
       
+      var sChunk=chunk.toString('utf8');
+      //console.log(sChunk);
+      var stringifyChunk=JSON.stringify(sChunk);
+      //console.log(stringifyChunk);
+      var jsonData = JSON.parse(stringifyChunk);
+      console.log("JSON DATA\n" + jsonData + "\nLENGTH " + jsonData.length);
+
+      var otro = JSON.parse(jsonData);
+      console.log("OTRO\n" + otro.length);
+      for(let i = 0; i< otro.length; i++){
+        rutas.push(new Ruta(otro[i]));//por cada elemento de la data parseada creamos un usuario en el array
+        console.log(otro[i]['imagen']);
+        //rutas.push(otro[i]);
+      }
+      console.log(rutas);
       e.reply("busqueda-realizada", JSON.stringify(rutas));//pasamos las rutas al app.js
+
     })
   })
   request.end()
@@ -352,14 +362,13 @@ async function obtenerIdRuta(localizacion){
  
 
 /* ***************************************************************************************************
-***************************** FORMULARIO DE EDICION  ***********************************************
+*********************************** FORMULARIO DE EDICION  *******************************************
 *****************************************************************************************************/
 
 //ir al form de editar ruta
 ipcMain.on("edit-ruta-form", async (e, arg) => {
   var ruta;
-  console.log("vamos al form edit");
-  console.log(arg);
+  
   //obtener la ruta a editar por su id
   const request = await net.request({ 
     method: 'GET', 
@@ -374,7 +383,7 @@ ipcMain.on("edit-ruta-form", async (e, arg) => {
       ruta=JSON.stringify(JSON.parse(chunk));
       console.log("r " + ruta);
       rutaEdit=ruta; //cambiamos la variable global
-      BrowserWindow.getFocusedWindow().loadFile('app/src/editar/editForm.html')//cambiamos el html de la ventana.
+      BrowserWindow.getFocusedWindow().loadFile('app/html/formEditRuta.html')//cambiamos el html de la ventana.
     })
   })
   request.end();
@@ -382,6 +391,7 @@ ipcMain.on("edit-ruta-form", async (e, arg) => {
 });
 //enviar los datos para editar
 ipcMain.on('obtener-datos-editar',(e)=>{
+  //falta mandar tambien la localizacion para editar
   e.reply('datos-edit', rutaEdit);
 })
 

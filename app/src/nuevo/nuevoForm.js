@@ -115,9 +115,8 @@ var placesAutocomplete = places({
     $("#div"+numLocalizaciones+" .subdiv").append("Imagen:<p><input id='imagenPregunta"+numLocalizaciones+"' type='file' ></p>");
 
     //ELEGIR TIPO PREGUNTA
-    $("#div"+numLocalizaciones+" .subdiv").append("<p><input type='radio' name='tipo' id='Pregunta"+numLocalizaciones+"'>    <label for='Pregunta'>Pregunta</label></p>");
-
-    $("#div"+numLocalizaciones+" .subdiv").append("<p><input type='radio' name='tipo' id='Localizacion"+numLocalizaciones+"'>    <label for='Localizacion'>Localizacion</label></p>");
+    $("#div"+numLocalizaciones+" .subdiv").append("Tipo:<p><input type='radio' name='tipo' id='Pregunta"+numLocalizaciones+"'><label for='Pregunta"+numLocalizaciones+"'>Pregunta</label></p>");
+    $("#div"+numLocalizaciones+" .subdiv").append("<p><input type='radio' name='tipo' id='Localizacion"+numLocalizaciones+"'><label for='Localizacion"+numLocalizaciones+"'>Localizacion</label></p>");
 
     //ELEGIR RESPUESTA CORRECTA
 
@@ -188,9 +187,9 @@ function showTab(n) {
     document.getElementById("prevBtn").style.display = "inline";
   }
   if (n == (x.length - 1)) {
-    document.getElementById("nextBtn").innerHTML = "Submit";
+    document.getElementById("nextBtn").innerHTML = "Enviar";
   } else {
-    document.getElementById("nextBtn").innerHTML = "Next";
+    document.getElementById("nextBtn").innerHTML = "Siguiente";
   }
   // ... and run a function that displays the correct step indicator:
   fixStepIndicator(n)
