@@ -93,7 +93,7 @@ ipcMain.on("login", async (e, arg) => {
      
         BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
       }else{
-        e.reply("login-error","EL USUARIO O CONTRASEnA SON INCORRECTOS");
+        e.reply("login-error","EL USUARIO O CONTRASEÑA SON INCORRECTOS");
         //console.log("EL USUARIO O CONTRASEnA SON INCORRECTOS");
       }
       

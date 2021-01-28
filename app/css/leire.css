@@ -59,12 +59,14 @@ input[type=submit]{
     border-radius: 10px;
     background-color: rgba(137, 184, 255, 0.349);
     padding: 2%;
+    margin: 2%;
 }
 #msg{
     color: rgb(255, 0, 0);
-    text-shadow: 2px 2px #0000008a;
+    text-shadow:4px 2px 7px #ffffffc7;
     font-size: 20px;
     text-align: center;
+    margin: 2%;
 }
 
 #rutaRegistro{

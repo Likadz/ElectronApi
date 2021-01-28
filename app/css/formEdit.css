@@ -1,19 +1,25 @@
 
+html{
+  zbackground-image:  url(../resources/fondo_vectorizado.jpg);
+ 
+}
 
 body{
+  xheight: 1vh;
   width: 100vw;
   height: 100vh;
-  background-image:  url(../resources/fondo2.jpg);
+  background-image:  url(../resources/fondo3.jpg);
   background-position: center center;
   background-size: cover;
 
   z-index: -9;
 }
+
 #regForm {
   /*background-color: #a3d883;*/
-  background-color: rgb(255, 255, 255); /* Fallback color */
-  background-color: rgba(255, 255, 255, 0.644); /* Black w/opacity/see-through */
-  color: rgb(0, 0, 0);
+  background-color: rgb(0, 0, 0); /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.507); /* Black w/opacity/see-through */
+  color: rgb(255, 255, 255);
   
   margin-left: 15%;
   padding: 40px;
@@ -183,10 +189,10 @@ input[type="radio"]:checked ~ label {
 #btnBack{
   width: 4%;
   margin: 1%;
-  background-color: rgba(255, 255, 255, 0.527); /* Black w/opacity/see-through */
+  xbackground-color: rgba(255, 255, 255, 0.527); /* Black w/opacity/see-through */
   border-radius: 50%;
-  padding: 1%;
-  border: solid 2px rgba(255, 73, 73, 0.295);
+  xpadding: 1%;
+  xborder: solid 2px rgba(255, 73, 73, 0.295);
 }
 #btnBack:hover{
   transform: scale(1.2);
