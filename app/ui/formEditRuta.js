@@ -28,6 +28,12 @@ ipcRenderer.on('datos-edit', (e, r, l) => {
   ciudad.value=ruta.ciudad;
   transporte.value=ruta.transporte;
   tematica.value=ruta.tematica;
+  //recorremos las estrellas y las marcamos segun la dificultad 
+  for(i=0;i< $('#dificultad input').length;i++){
+    if(i<=ruta.dificultad){
+      $('input[type="radio"][value='+i+']').prop('checked',true);
+    }
+  }
   dificultad.value=ruta.dificultad;
  
 });
