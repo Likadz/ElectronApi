@@ -1,0 +1,160 @@
+body {
+    xbackground-color: green;
+
+}
+
+/********************************/
+/**BARRA DE NAVEGACION DEL CHAT**/
+/********************************/
+
+.chatImg {
+    width: 0;
+    position: relative;
+    float: right;
+    margin-right: 5%;
+    margin-top: 5px;
+}
+
+.menuChat{
+    float: right;
+    margin-right: 20%;
+    position: absolute;
+    top: 0%;
+    right: 5%;
+    visibility: hidden;
+    
+}
+
+.sidebarChat {
+    position: fixed;
+    width: 25%;
+    height: 100%;
+    background: rgba(124, 202, 238, 0.836);
+    font-size: 0.65em;
+    margin-right: 25%;
+}
+
+.tituloChat, .tituloChatRuta{
+    position: relative;
+    text-align: left;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: rgb(20, 20, 20);
+    font-size: 30px;
+    top: 15px;
+    left: 30px;
+}
+
+.imgVolverChat, .imgVolverRutasChat{
+    position: relative;
+    float: right;
+    width: 60px;
+    margin-right: 10px;
+    
+    background-color: rgb(0, 0, 0);
+    border-radius: 50%;
+}
+
+.dropdown {
+    position: absolute;
+    width: 200px;
+    height: 250px;
+    background-color: rgb(8, 193, 255);
+    display: none;
+}
+
+.navChat {
+    position: relative;
+    text-align: left;
+    font-weight: bold;
+}
+
+.navChat ul {
+    list-style: none;
+    margin-right: 20px;
+    margin-top: 40px;
+    overflow:hidden; 
+    overflow-y:auto;
+    height: 85vh;
+}
+
+.navChat ul li {
+    position: relative;
+}
+
+.navChat ul li a {
+    line-height: 3em;
+    text-transform: uppercase;
+    text-decoration: none;
+    letter-spacing: 0.4em;
+    color: white;
+    display: block;
+    font-size: 20px;
+}
+
+.navChat ul li:not(.active):hover a {
+    color: black;
+    transition: all ease-out 300ms;
+}
+
+.navChat ul li::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 0.2em;
+    background: black;
+    left: 0;
+    bottom: 0;
+    background-image: linear-gradient(to right, #ffffff, #ffffff)
+}
+
+.textareaChat {
+    position: absolute;
+    width: 80%;
+    bottom: 10px;
+    left: 3%;
+
+    resize: none;
+    overflow: hidden;
+    min-height: 50px;
+    max-height: 100px;
+}
+
+.botonChat {
+    position: absolute;
+    width: 12%;
+    height: 55px;
+    bottom: 10px;
+    right: 2%;
+}
+
+.botonChat img {
+    width: 100%;
+    height: 100%;
+}
+
+
+.fondoChat {
+    position: absolute;
+    top: 8%;
+    left: 3%;
+    right: 3%;
+    height: 84%;
+    background-color: rgb(255, 234, 197);
+    border-radius: 25px;
+    overflow-y: auto;
+    
+}
+
+#contenidoChat {
+    font-size: medium;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+  
+
+#chatRuta{
+    visibility: hidden;
+}

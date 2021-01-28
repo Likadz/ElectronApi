@@ -1,14 +1,26 @@
+
 html{
-  background-color: #5CA4BC;
+  zbackground-image:  url(../resources/fondo_vectorizado.jpg);
+ 
 }
 
 body{
-  height: 1vh;
-  background-color: #5CA4BC;
+  xheight: 1vh;
+  width: 100vw;
+  height: 100vh;
+  background-image:  url(../resources/fondo3.jpg);
+  background-position: center center;
+  background-size: cover;
+
+  z-index: -9;
 }
 
 #regForm {
-  background-color: #a3d883;
+  /*background-color: #a3d883;*/
+  background-color: rgb(0, 0, 0); /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.507); /* Black w/opacity/see-through */
+  color: rgb(255, 255, 255);
+  
   margin-left: 15%;
   padding: 40px;
   width: 70%;
@@ -123,7 +135,8 @@ input[type="radio"]:checked ~ label {
 }
 
 #container{
-  background-color: #5CA4BC;
+  /*background-color: #5CA4BC;*/
+  
 }
 
 #localizacionesDeRuta{
@@ -131,7 +144,9 @@ input[type="radio"]:checked ~ label {
 }
 
 #pregunta{
-  background-color: #a3d883;
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0, 0.4); /* Black w/opacity/see-through */
+  color: white;
   margin-left: 15%;
   padding: 40px;
   width: 70%;
@@ -140,7 +155,9 @@ input[type="radio"]:checked ~ label {
 }
 
 #accordeonPreguntas div{
-  background-color: #a3d883;
+  background-color: rgba(0, 0, 0, 0.514); /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.61); /* Black w/opacity/see-through */
+  color: white;
   margin-left: 15%;
   padding: 20px;
   width: 70%;
@@ -166,4 +183,17 @@ input[type="radio"]:checked ~ label {
 #Pregunta, #Localizacion{
   display: contents;
 
+}
+
+/* LEIRE */
+#btnBack{
+  width: 4%;
+  margin: 1%;
+  xbackground-color: rgba(255, 255, 255, 0.527); /* Black w/opacity/see-through */
+  border-radius: 50%;
+  xpadding: 1%;
+  xborder: solid 2px rgba(255, 73, 73, 0.295);
+}
+#btnBack:hover{
+  transform: scale(1.2);
 }

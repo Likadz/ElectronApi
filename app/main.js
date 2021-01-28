@@ -19,6 +19,8 @@ function createWindow() {
     },
     icon:'./app/resources/explorer.png'//cambiar el logo del programa
   });
+
+  win.maximize();
   
   //pantalla completa
   //win.setFullScreen(true)
@@ -244,7 +246,7 @@ ipcMain.on("buscar", async (e, arg) => {
 *****************************************************************************************************/
 //ir al form de crear ruta
 ipcMain.on("create-ruta-form", async (e, arg) => {
-  BrowserWindow.getFocusedWindow().loadFile('app/src/nuevo/nuevoForm.html')//cambiamos el html de la ventana.
+  BrowserWindow.getFocusedWindow().loadFile('app/html/formCrearRuta.html')//cambiamos el html de la ventana.
 });
 
 
@@ -341,7 +343,6 @@ async function obtenerIdRuta(localizacion){
 
  //actualizar la lista de localizaciones de la ruta con id X
  function actualizarDatos(id){
-  // console.log("id " + id);
    const request = net.request({ 
      method: 'PUT', 
      protocol: 'http:', 
@@ -357,7 +358,9 @@ async function obtenerIdRuta(localizacion){
        //console.log("datos actualizados");
      })
    })
-   request.end();
+   request.end(()=>{
+     console.log("actualizacion request acabada");
+   });
  }
  
 
@@ -413,13 +416,14 @@ ipcMain.on('obtener-datos-editar',async (e)=>{
       response.on('data',async (chunk) => {
       
         ruta=JSON.parse(JSON.parse(JSON.stringify(chunk.toString('utf8'))));
+        
         localizacionEdit.push(ruta); //cambiamos la variable 
        
       })
     })
     request.end();
   }
- 
+  console.log("rutasedit " + JSON.stringify(rutaEdit) + "\nlocalizacionesedit " + JSON.stringify(localizacionEdit));
   e.reply('datos-edit', JSON.stringify(rutaEdit), JSON.stringify(localizacionEdit));
 })
 
@@ -430,8 +434,14 @@ ipcMain.on("editar-datos",async (e,arg)=>{
   
   var idR=elBody['id'];//id de la ruta
   var pathRuta=`/rutas/editId/${idR}`;//path update ruta
+  /*
+  var imagen = elBody['imagen'].substring(elBody['imagen'].indexOf("fakepath"));
+  console.log(imagen.substring(9,-1));
+  elBody['imagen']=imagen.substring(9,-1);
+  console.log('imagen ' + elBody[imagen]);*/
   var bodyRuta=JSON.stringify(elBody);//el body que pasamos al update de la ruta
   console.log("HAGAMOS EL UPDATE DE " +  bodyRuta);
+ 
   /*var localizacion = elBody['listaLocalizaciones'];
   //update de las localizaciones
   for(let i=0 ; i<localizacion.length; i++){
@@ -464,12 +474,56 @@ ipcMain.on("editar-datos",async (e,arg)=>{
     },  
     body: bodyRuta
   }); 
- 
-  //request.write(bodyRuta, 'utf-8');
-  request.end();
+  request.write(bodyRuta);
+  request.end(async ()=>{
+   //e.reply('actualizar-datos');
+  });
   BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
+  
 });
 
+ipcMain.on('actualizar-datos', async (e,arg)=>{
+  await actualizarDatos(arg);//actualizar la lista de las localizaciones de la ruta
+  BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
+})
+
+
+
+
+/* ***************************************************************************************************
+******************************************** CHAT  **************************************************
+*****************************************************************************************************/
+
+ipcMain.on("chat",async (e)=>{
+  
+  //get rutas
+  request = await net.request({ 
+    method: 'GET', 
+    protocol: 'http:', 
+    hostname: '127.0.0.1', 
+    port: 8080,
+    path: '/rutas/getAll'
+  }); 
+  request.on('response',  (response) => {
+    //cogemos la data 
+    response.on('data',async (chunk) => {
+    
+      let rutas=[];//array de usuarios
+      var sChunk=chunk.toString('utf8');//pasamos el buffer a strin tipo utf/
+      var stringifyChunk=JSON.stringify(sChunk);
+      var jsonData = JSON.parse(stringifyChunk);
+
+      var otro = JSON.parse(jsonData);//creamos un json de los datos
+      for(let i = 0; i< otro.length; i++){
+        rutas.push(otro[i]);
+      }
+
+      e.reply("chat",JSON.stringify(rutas));
+    }
+  )}); 
+  request.end();
+ 
+})
 
 
 module.exports = { createWindow };

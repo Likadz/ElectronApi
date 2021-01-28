@@ -7,6 +7,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HOME</title>
   <link rel="stylesheet" href="../css/leire.css">
+  <link rel="stylesheet" href="../css/chat.css">
+  <script>window.$ = window.jQuery = require('jquery');</script>
   <link href="../../dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
@@ -51,7 +53,59 @@
     <img src="../resources/addRuta.png" alt="" class="btn" id="btnAdd" >
 
   </div>
+
+
+
+  <!--CHAT -->
+  <div id="Chat" class="menuChat">
+            
+      <div id="rutasChats">
+      <aside class="sidebarChat">
+      <label class="tituloChat">chats geocoder</label>
+      <img class="imgVolverChat" src="../resources/images/flechaVolver.png">
+      <nav class="navChat">
+      <ul class="listaChats">
+          <!--
+          <li><a href="#" onclick="conexion('ruta X')">Chat 1</a></li>
+          <li><a href="#" onclick="conexion('ruta Y')">Chat 2</a></li>
+          -->
+      </ul>
+      
+      </nav>
+      </aside>
+      </div>
+
+      <div id="chatRuta">
+          <aside class="sidebarChat">
+              <label class="tituloChatRuta">RUTA X</label>
+              <img class="imgVolverRutasChat" src="../resources/images/flechaVolver.png" onclick="desconexion()">
+              <div class="fondoChat">
+                  <div id="contenidoChat"></div>
+              </div>
+              <textarea class="textareaChat" oninput="auto_grow(this)" placeholder="Escribe a los usuarios de este chat" onkeypress="botonPulsado();"></textarea>
+              <button class="botonChat" onclick="anadirTexto()"><img src="../resources/images/flechaEnviar.png"></button>
+          </aside>
+      </div>
+  </div>
+
   <script src="../ui/home.js"></script>
+  <!--<script src="../ui/chat.js"></script>-->
+  <script>
+        $('.imgVolverChat').on("click", function(e) {
+            $('#Chat').fadeToggle('fast');
+        });
+
+        //funcion de autoagrandamiento del text area segun su contenido
+        function auto_grow(element) {
+            element.style.height = "5px";
+            element.style.height = (element.scrollHeight)+"px";
+        }
+
+        //no se puede hacer drag a las imagenes
+        $('img').on('dragstart', function(event) { event.preventDefault(); });
+
+
+  </script>
 </body>
 
 </html>

@@ -1,41 +1,41 @@
 const {ipcRenderer } = require("electron");
 const { $where } = require("../models/Ruta");
 
-const seleccionado =  document.querySelector("#ciudad");
 const rutaList = document.querySelector("#rutaList");
-
 const btnBuscar =document.querySelector("#btnBuscar");
 const btnClean = document.querySelector("#btnClean");
 const exit = document.querySelector(".exit");
-
 const btnAdd = document.querySelector("#btnAdd");
 const loading = document.querySelector("#loading");
 
+
+//const btnChat = document.querySelector("#imgChat");
 //add ruta (ir al form)
 document.querySelector("#btnAdd").addEventListener('click', e => {
     ipcRenderer.send('addRuta');
 });
 
-
+//funcion para cuando selecciona eliminar una ruta
 function deleteruta(id) {
-    
     const response = confirm("¿esta seguro de que quiere eliminarlo?");
     if (response) {
       ipcRenderer.send("delete-ruta", id);
     }
     return;
 }
+
 function editruta(id) {
     ipcRenderer.send("edit-ruta-form",id);
 }
+//mostrar las rutas actuales
 function renderrutas(rutas) {
     rutaList.innerHTML = "";
-    console.log(rutas);
+    console.log(rutas['imagen']);
     
     rutas.map(r => {
     //si la ruta no tiene imagen definida le ponemos una basica
     if(r.imagen=="" || r.imagen==null){
-        r.imagen="fondo.jpg";
+        r.imagen="fondo2.jpg";
     }
     rutaList.innerHTML += `
         <div class="col-md-4 " >
@@ -111,3 +111,129 @@ ipcRenderer.on('edit-ruta', (e, args) => {
     var ruta = JSON.parse(args);
     console.log(ruta['nombre']);
   });
+
+
+
+/* **************************************
+  ************ CHAT  ********************
+ ***************************************/
+//CONSTANTES
+const listadoChat = document.querySelector(".listaChats");
+const rutasChat = document.querySelector("#rutasChats");
+const chatRuta = document.querySelector("#chatRuta");
+const menuChat = document.querySelector(".menuChat");
+const volverChat = document.querySelector(".imgVolverRutasChat");
+const btnChat=document.querySelector("#imgChat");
+
+var net = require('net');
+
+var usuario = "Endibra";
+var ruta = "";
+//conexion 
+puerto = 1234;
+ip = '127.0.0.1'
+var client = new net.Socket();
+
+//click boton chat
+btnChat.addEventListener('click',e=>{
+    ipcRenderer.send('chat');
+});
+//mostramos el chat 
+ipcRenderer.on("chat", (e,arg)=>{
+    menuChat.style.visibility="visible";//activamos la visibilidad
+    renderChatRutas(JSON.parse(arg));//render de la lista de chats existentes
+})
+
+
+//Funcion para crear lista de chat rutas
+function renderChatRutas(rutas) {
+    listadoChat.innerHTML = "";
+    rutas.map(r => {
+        listadoChat.innerHTML += `<li><a href="#"  onclick="conexion('${r.nombre}')">${r.nombre}</a></li>`;
+    });
+}
+
+//conexion cliente
+client.connect(puerto, ip, function() {
+    console.log('Conectado');
+});
+
+//cuando damos volver ocultamos el chat y volvemos a la lista
+volverChat.addEventListener('click',e=>{
+    rutasChat.style.visibility='visible';
+    chatRuta.style.visibility='hidden';
+})
+//cuando clica un chat mostramos su conversacion
+function conexion(route) {
+    rutasChat.style.visibility='hidden';
+    chatRuta.style.visibility='visible';
+    ruta = route;
+    var loginJson = '{ "action": "login", "user":"'+usuario+'", "route":"'+ruta+'"}';
+    
+   // client.write(loginJson);
+    //client.write("\n");
+}
+
+function desconexion() {
+    $(".textareaChat").val("");
+    $(".textareaChat").height('5px');
+    var contenidoChat = document.getElementById("contenidoChat");
+    contenidoChat.innerHTML="";
+}
+
+
+client.on("data", (data) => {
+    var datos = JSON.parse(data);
+    anadirTextoExterno(datos);
+});
+
+function escribirTextoInterno(mensaje) {
+    var mensajeJSON = '{"action":"msg","from":"'+usuario+'","route":"'+ruta+'","value":"'+mensaje+'"}';
+    client.write(mensajeJSON);
+    client.write("\n");
+}
+
+
+function botonPulsado() {
+    //si se le da enter, envia el texto automaticamente
+    if (window.event.keyCode === 13) {
+        anadirTexto();
+        
+        //vaciamos el textarea y le ajustamos el tamaño en caso de que haya escrito mucho
+        $(".textareaChat").val("");
+        $(".textareaChat").height('5px');
+
+        //evitamos que ponga un espacio cuando no hace falta
+        window.event.preventDefault();
+    }
+}
+
+function anadirTexto() {
+    mensaje = $('.textareaChat').val();
+    if(mensaje != ""){
+        escribirTextoInterno(mensaje);
+        var content = document.createElement("div");
+
+        content.innerHTML = mensaje;
+    
+        $('#contenidoChat').append(content).append('<hr>');
+
+        //vaciamos el textarea
+        $(".textareaChat").val("");
+        $(".textareaChat").height('5px');
+    }
+}
+
+function anadirTextoExterno(json) {
+    if(json["value"] != ""){
+        var content = document.createElement("div");
+
+        //cambiamos
+        mensaje = json["value"];
+
+        content.innerHTML = mensaje;
+    
+        $('#contenidoChat').append(content).append('<hr>');
+    }
+}
+

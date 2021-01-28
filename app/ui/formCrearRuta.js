@@ -1,6 +1,25 @@
 //import L from 'leaflet';
 window.$ = window.jQuery = require('jquery');
 
+//Obtener las ciudades de la base de datos
+const {ipcRenderer } = require("electron");
+/*ipcRenderer.send('getCiudades');
+ipcRenderer.on("busqueda-ciudades", (e, args) => {
+  const ciudades = JSON.parse(args);
+  console.log("las ciudades " +ciudades);
+  for(let i=0; i<ciudades.length; i++){
+    //añadir las ciudades al selector
+    var o = new Option(ciudades[i], ciudades[i]);//creamos una opcion
+    $(o).html(ciudades[i]);
+    $("#ciudadRuta").append(o);//la añadimos al selector
+  }
+});*/
+const btnVolver = document.querySelector("#btnBack");
+//boton volver a home
+btnVolver.addEventListener('click', e => {
+  ipcRenderer.send("volver-home");
+});
+
 
 var currentTab = 0; // Current tab is set to be the first tab (0)
 showTab(currentTab); // Display the current tab
@@ -28,7 +47,7 @@ var placesAutocomplete = places({
         map.setView([suggestion.latlng.lat,suggestion.latlng.lng],15);
     }
   },
-  });
+});
 
   placesAutocomplete.on('change', e => {
     map.setView([e.suggestion.latlng.lat,e.suggestion.latlng.lng],15);
@@ -71,7 +90,7 @@ var placesAutocomplete = places({
 
     //NOMBRE LOCALIZACION
 
-    $('#accordeonPreguntas').append("<div id='div"+numLocalizaciones+"'><h1 onclick='pestana("+numLocalizaciones+")'>"+lugar+"</h1></div>");    
+    $('#accordeonPreguntas').append("<div id='div"+numLocalizaciones+"'><h1 onclick='pestana("+numLocalizaciones+")' id='h1Lugar"+numLocalizaciones+"'>"+lugar+"</h1></div>");    
     
     $("#div"+numLocalizaciones).append("<div class='subdiv'> </div>");
 
@@ -90,27 +109,28 @@ var placesAutocomplete = places({
     //ESCRBIR PREGUNTA C
 
     $("#div"+numLocalizaciones+" .subdiv").append("Pregunta C:<p><input id='preguntaC"+numLocalizaciones+"' placeholder='Pregunta C' oninput=''></p> ");
-
+ 
     //ESCRBIR IMAGEN
 
-    $("#div"+numLocalizaciones+" .subdiv").append("Imagen:<p><input id='imagenPregunta"+numLocalizaciones+"' type='file'></p>");
+    $("#div"+numLocalizaciones+" .subdiv").append("Imagen:<p><input id='imagenPregunta"+numLocalizaciones+"' type='file' ></p>");
 
     //ELEGIR TIPO PREGUNTA
-    
-    $("#div"+numLocalizaciones+" .subdiv").append("<p><input type='radio' name='tipo' id='Pregunta"+numLocalizaciones+"'>    <label for='Pregunta'>Pregunta</label></p>");
-
-    $("#div"+numLocalizaciones+" .subdiv").append("<p><input type='radio' name='tipo' id='Localizacion"+numLocalizaciones+"'>    <label for='Localizacion'>Localizacion</label></p>");
+    $("#div"+numLocalizaciones+" .subdiv").append("Tipo:<p><input type='radio' name='tipo' id='Pregunta"+numLocalizaciones+"'><label for='Pregunta"+numLocalizaciones+"'>Pregunta</label></p>");
+    $("#div"+numLocalizaciones+" .subdiv").append("<p><input type='radio' name='tipo' id='Localizacion"+numLocalizaciones+"'><label for='Localizacion"+numLocalizaciones+"'>Localizacion</label></p>");
 
     //ELEGIR RESPUESTA CORRECTA
 
-    $("#div"+numLocalizaciones+" .subdiv").append("Respuesta correcta:    <p><select id='respuestaPregunta"+numLocalizaciones+"' class='form-select' aria-label='Default select example'>      <option selected>Open this select menu</option>      <option value='1'>A</option>      <option value='2'>B</option>      <option value='3'>C</option>  </select></p>");
+    //$("#div"+numLocalizaciones+" .subdiv").append("Respuesta correcta:    <p><select id='respuestaPregunta"+numLocalizaciones+"' class='form-select' aria-label='Default select example'> <option selected>selecciona la respuesta correcta</option>  <option value='1'>A</option>      <option value='2'>B</option>      <option value='3'>C</option>  </select></p>");
+    $("#div"+numLocalizaciones+" .subdiv").append(`Respuesta correcta:<p><select id='respuestaPregunta${numLocalizaciones}' name='respuestaPregunta${numLocalizaciones}' class='form-select' aria-label='Default select example'><option selected>selecciona la respuesta correcta</option><option value='1'>A</option><option value='2'>B</option><option value='3'>C</option></select></p>` );
 
     $("#div"+numLocalizaciones+" .subdiv").hide();
     $("#div0 .subdiv").show();
 
     numLocalizaciones++;
+ 
   }
 
+  
 
 function pestana(num){
   
@@ -144,7 +164,7 @@ function editar(sitio){
 }
 
 function salirEditar(){
-  window.location.href = 'index.html';
+  window.location.href = 'nuevoForm.html';
 
 }
 
@@ -167,10 +187,9 @@ function showTab(n) {
     document.getElementById("prevBtn").style.display = "inline";
   }
   if (n == (x.length - 1)) {
-    document.getElementById("nextBtn").innerHTML = "Submit";
-    
+    document.getElementById("nextBtn").innerHTML = "Enviar";
   } else {
-    document.getElementById("nextBtn").innerHTML = "Next";
+    document.getElementById("nextBtn").innerHTML = "Siguiente";
   }
   // ... and run a function that displays the correct step indicator:
   fixStepIndicator(n)
@@ -199,6 +218,7 @@ function nextPrev(n) {
     showTab(currentTab);
     console.log('enviado');
     recogerYEnviar();
+    
     return false;
   }
   // Otherwise, display the correct tab:
@@ -246,64 +266,58 @@ function recogerYEnviar(){
       difi = $('#dificultad input')[i].value;
     }
   }
-
+  if($('#imagenRuta').val()==null){
+    $('#imagenRuta').val('foto.jpg');
+  }
   var JSONRuta =  {
-  "nombreRuta" : $('#nombreRuta').val(),
-  "descripcionRuta" : $('#descripcionRuta').val(),
-  "imagenRuta" : $('#imagenRuta').val(),
-  "ciudadRuta" : $('#ciudadRuta').val(),
-  "transporteRuta" : $('#transporteRuta').val(),
-  "tematicaRuta" : $('#tematicaRuta').val(),
-  "dificultadRuta":difi};
-  
-  var localizacionesJSON = [];
-  console.log($('#accordeonPreguntas div').even().length);
-  for (i = 0; i < $('#accordeonPreguntas div').even().length; i++){
-    console.log('#div'+i+" #descripcionPregunta"+i);
-    var JSONPregunta = {
-      "descripcionPregunta" :  $('#div'+i+" #descripcionPregunta"+i).val(),
-      "preguntaA" : $('#div'+i+" #preguntaA"+i).val(),
-      "preguntaB" : $('#div'+i+" #preguntaB"+i).val(),
-      "preguntaC" : $('#div'+i+" #preguntaC"+i).val(),
-      "imagenPregunta" : $('#div'+i+" #imagenPregunta").val(),
-      "tipoPregunta" : $('#div'+i+" #tipoPregunta"+i).val(),
-      "respuestaCorrecta" : $('#div'+i+" #respuestaCorrecta"+i).val(),
-    }
+    "nombre" : $('#nombreRuta').val(),
+    "descripcion" : $('#descripcionRuta').val(),
+    "imagen" : $('#imagenRuta').val(),
+    "ciudad" : $('#ciudadRuta').val(),
+    "transporte" : $('#transporteRuta').val(),
+    "tematica" : $('#tematicaRuta').val(),
+    "dificultad":difi,
+    "listaLocalizaciones":[],
+  };
+  //console.log("RUTAS JSON " + JSON.stringify(JSONRuta));
 
+  var localizacionesJSON = [];
+ // console.log($('#accordeonPreguntas div').even().length);
+ 
+  for (i = 0; i < $('#accordeonPreguntas div').even().length; i++){
+    var JSONPregunta = {
+      "pregunta" :  $("#descripcionPregunta"+i).val(),
+      "respuesta1" : $("#preguntaA"+i).val(),
+      "respuesta2" : $("#preguntaB"+i).val(),
+      "respuesta3" : $("#preguntaC"+i).val(),
+      "imagen" : $("#imagenPregunta"+i).val(),
+      "tipo" : "pregunta",
+      "correcta" :$( "#respuestaPregunta"+i).val(),
+      
+    }
+    /*console.log("PREGUNTA DATOS "+ JSON.stringify(JSONPregunta));
+    var preguntaJSON=[];
+    preguntaJSON.push(JSONPregunta);*/
     var JSONLocalizacion = {
-      "nombre":$('#accordeonPreguntas div'+i).text(),
+      "nombre":$("#h1Lugar"+i).text(),
       "latitud":localizaciones[i][0],
       "longitud":localizaciones[i][1],
-      "pista":"aggd",
+      "pista":$("#h1Lugar"+i).text(),
       "oculta":true,
+      "rutaId":"0",
       "pregunta":JSONPregunta,
     }
 
     localizacionesJSON.push(JSONLocalizacion);
     
   }
-
+  
   console.log(localizacionesJSON);
-    
-
-  //Cambiar direccion por la de la api
-  fetch('https://httpbin.org/post',{
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(JSONRuta),
-    })
-    .then(function(response) {
-        return response.json();
-    })
-    .then(function(data) {
-        console.log('data = ', data);
-    })
-    .catch(function(err) {
-        console.error(err);
-    });
-
+  ipcRenderer.send('crear-ruta',JSONRuta);
+  ipcRenderer.send('crear-localizacion',localizacionesJSON);
   
 
+  //volvemos al home
+  ipcRenderer.send("volver-home");
+      
 }

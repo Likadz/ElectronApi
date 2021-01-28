@@ -1,7 +1,10 @@
 const { ipcMain } = require("electron");
 const {ipcRenderer } = require("electron");
 //import L from 'leaflet';
+window.$ = window.jQuery = require('jquery');//para usar jquery
 
+var laRuta;
+var localizacionesEdit;
 //campos del formulario
 const nombre = document.querySelector("input[name='nombre']");
 const descripcion = document.querySelector("#descripcion");
@@ -9,27 +12,23 @@ const ciudad = document.querySelector("#ciudadRuta");
 const transporte= document.querySelector("#transporteRuta");
 const tematica = document.querySelector("#tematicaRuta");
 const dificultad=document.querySelector("#dificultad");
-const imagen=document.querySelector("#imagenRuta");
+//const imagen=document.querySelector("#imagenRuta");
 var id;
 //pedimos los datos
 ipcRenderer.send('obtener-datos-editar');
 //rellenamos el formulario
 ipcRenderer.on('datos-edit', (e, r, l) => {
   var ruta = JSON.parse(r);
-  var localizaciones = JSON.parse(l);
-  console.log(ruta);
+  laRuta=ruta;
+  localizacionesEdit = JSON.stringify(JSON.parse(l));
 
   id=ruta['id'];
-  //console.log(args['nombre']);
   nombre.value=ruta['nombre'];
   descripcion.value=ruta['descripcion'];
   ciudad.value=ruta.ciudad;
   transporte.value=ruta.transporte;
   tematica.value=ruta.tematica;
   dificultad.value=ruta.dificultad;
-  imagen.src=`../resources/${ruta.imagen}`;
-
-  //
  
 });
 
@@ -44,8 +43,7 @@ btnVolver.addEventListener('click', e => {
 
 var currentTab = 0; // Current tab is set to be the first tab (0)
 showTab(currentTab); // Display the current tab
-titulo = ["Nueva Ruta","Nueva localizacion","Pregunta"];
-
+titulo = ["Editar Ruta","Editar localizacion","Pregunta"];
 
 var map = L.map('mapid').setView([51.505, -0.09], 13);
 
@@ -65,7 +63,7 @@ function showTab(n) {
   x[n].style.display = "block";
  
   if (titulo[n] === undefined){
-    document.getElementById("titulo").innerHTML = "Nueva Ruta";
+    document.getElementById("titulo").innerHTML = " Editar Ruta";
   }else{
     document.getElementById("titulo").innerHTML = titulo[n];
   }
@@ -77,12 +75,16 @@ function showTab(n) {
     document.getElementById("prevBtn").style.display = "inline";
   }
   if (n == (x.length - 1)) {
-    document.getElementById("nextBtn").innerHTML = "Submit";
+    document.getElementById("nextBtn").innerHTML = "Enviar";
   } else {
-    document.getElementById("nextBtn").innerHTML = "Next";
+    document.getElementById("nextBtn").innerHTML = "Siguiente";
   }
   // ... and run a function that displays the correct step indicator:
   fixStepIndicator(n)
+  //si esta en la pesaña del mapa
+  if(n==1){
+    rellenarTabla();//poner una tabla con las localizacionesEdit actuales  
+  }
 }
 
 function nextPrev(n) {
@@ -139,23 +141,56 @@ function fixStepIndicator(n) {
 
 
 function recogerYEnviar(){
+  var difi;
+  for(i=0;i< $('#dificultad input').length;i++){
+    if($('#dificultad input')[i].checked){
+      difi = $('#dificultad input')[i].value;
+    }
+  }
+
   console.log("enviar " + id);
   var JSONRuta =  {
     "id":id,
     "nombre" : nombre.value,
     "descripcion" :descripcion.value,
-    "imagen" : imagen.value,
+    "imagen" :"fondo2.jpg",
     "ciudad" : ciudad.value,
     "transporte" : transporte.value,
     "tematica" :tematica.value,
-    "dificultad":1,
+    "dificultad":difi,
     "listaLocalizaciones":[],
   };
     
   ipcRenderer.send('editar-datos',JSONRuta);
-
+  //ipcRenderer.send('actualizar-datos', JSONRuta['id'])
 }
 
 
-//hacer el update
-//ipcRenderer.send("editar-datos",JSONRuta);
+var localizaciones = [];
+var listaMarker = [];
+function rellenarTabla(){
+  
+  //console.log('localizaciones ' + localizaciones);
+  var loc = JSON.parse(localizacionesEdit);
+  console.log(loc[0]['nombre']);
+  for(let i = 0 ; i < loc.length; i++){
+    console.log("localizacion " + loc[i]['nombre']);
+    $('#localizacionesDeRuta').append("<tr id='"+i+"'></tr>");
+
+    $('#localizacionesDeRuta #'+i).append("<th scope='row'>"+loc[i]['nombre']+"</th><td></td>");
+
+    $('#localizacionesDeRuta #'+i+" td").append("<Button type='button' onclick=borrar('"+i+"')><em class='fas fa-eraser'></em></Button>");
+  
+    var latitud = loc[i]['latitud'];
+    var longitud = loc[i]['longitud'];
+    localizaciones.push([latitud,longitud]);
+    console.log(localizaciones);
+
+    marker = new L.marker(localizaciones[i]);
+    map.addLayer(marker);
+    marker.bindPopup('Localizacion '+(i+1)).openPopup();
+
+    listaMarker.push(marker);
+  }
+ 
+}
