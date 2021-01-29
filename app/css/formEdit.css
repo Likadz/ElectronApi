@@ -5,13 +5,11 @@ html{
 }
 
 body{
-  xheight: 1vh;
   width: 100vw;
   height: 100vh;
   background-image:  url(../resources/fondo3.jpg);
   background-position: center center;
   background-size: cover;
-
   z-index: -9;
 }
 

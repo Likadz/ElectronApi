@@ -423,34 +423,39 @@ ipcMain.on('obtener-datos-editar',async (e)=>{
     })
     request.end();
   }
-  console.log("rutasedit " + JSON.stringify(rutaEdit) + "\nlocalizacionesedit " + JSON.stringify(localizacionEdit));
+  console.log(rutaEdit);
   e.reply('datos-edit', JSON.stringify(rutaEdit), JSON.stringify(localizacionEdit));
 })
 
 
 //hacer el update de los datos
-ipcMain.on("editar-datos",async (e,arg)=>{
-  var elBody = JSON.parse(JSON.stringify(arg));
-  
-  var idR=elBody['id'];//id de la ruta
+ipcMain.on("editar-datos",async (e,arg, loc)=>{
+  //console.log('LOCALIZACION ' + JSON.stringify(loc) + "\nRUTA " + JSON.stringify(arg));
+  var elBodyRuta = JSON.parse(JSON.stringify(arg));
+  var elBodyLoc = JSON.parse(JSON.stringify(loc));
+
+  var idR=elBodyRuta['id'];//id de la ruta
+  var idL="60015b33e6d96332d2adfd3a";
+  var pathLoc=`/localizaciones/editId/60015b33e6d96332d2adfd3a`;
   var pathRuta=`/rutas/editId/${idR}`;//path update ruta
-  /*
-  var imagen = elBody['imagen'].substring(elBody['imagen'].indexOf("fakepath"));
-  console.log(imagen.substring(9,-1));
-  elBody['imagen']=imagen.substring(9,-1);
-  console.log('imagen ' + elBody[imagen]);*/
-  var bodyRuta=JSON.stringify(elBody);//el body que pasamos al update de la ruta
-  console.log("HAGAMOS EL UPDATE DE " +  bodyRuta);
- 
-  /*var localizacion = elBody['listaLocalizaciones'];
+
+  var bodyRuta=JSON.stringify(elBodyRuta);//el body que pasamos al update de la ruta
+  var bodyLoc = JSON.stringify(elBodyLoc);
+
+  console.log('loc ' + bodyLoc +"\nid " + idL);
+  
   //update de las localizaciones
-  for(let i=0 ; i<localizacion.length; i++){
+  for(let i=0 ; i<JSON.stringify(loc).length; i++){
      const request = await net.request({ 
       method: 'PUT', 
       protocol: 'http:', 
       hostname: '127.0.0.1', 
       port: 8080,
-      path: '/localizaciones/editId/'+localizacion[i].id    
+      path: pathLoc,
+      headers: {
+        'Content-Type': 'application/json'
+      },  
+      body: bodyLoc 
     }); 
     request.on('response', (response) => {
       //cogemos la data 
@@ -458,10 +463,11 @@ ipcMain.on("editar-datos",async (e,arg)=>{
         
       })
     })
-    request.write(localizacion[i]);
+    request.write(bodyLoc);
     request.end();
-  }*/
-
+  }
+  console.log("Localizacion actualizada");
+  
   //update de la ruta
   const request = await net.request({ 
     method: 'PUT', 

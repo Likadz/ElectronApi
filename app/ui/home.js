@@ -34,8 +34,14 @@ function renderrutas(rutas) {
     
     rutas.map(r => {
     //si la ruta no tiene imagen definida le ponemos una basica
-    if(r.imagen=="" || r.imagen==null){
-        r.imagen="fondo2.jpg";
+    if( r.imagen==null || r.imagen=="" ){
+        if(r.tematica =="comida"){
+            r.imagen="comida.jpg";
+        }else if(r.tematica=="turismo"){
+            r.imagen="turismo.jpg";
+        }else{
+            r.imagen="misterio.jpg";
+        }
     }
     rutaList.innerHTML += `
         <div class="col-md-4 " >
@@ -131,7 +137,14 @@ var usuario = "Endibra";
 var ruta = "";
 //conexion 
 puerto = 1234;
-ip = '127.0.0.1'
+ip = '10.10.12.183'//IP Mikel
+
+//ip servidor
+//ip='13.95.106.247' 
+//puerto chat
+//443
+
+//ip = '127.0.0.1' //local
 var client = new net.Socket();
 
 //click boton chat
@@ -147,6 +160,7 @@ ipcRenderer.on("chat", (e,arg)=>{
 
 //Funcion para crear lista de chat rutas
 function renderChatRutas(rutas) {
+    menuChat.style.visibility="visible";//activamos la visibilidad
     listadoChat.innerHTML = "";
     rutas.map(r => {
         listadoChat.innerHTML += `<li><a href="#"  onclick="conexion('${r.nombre}')">${r.nombre}</a></li>`;
@@ -168,6 +182,7 @@ function conexion(route) {
     rutasChat.style.visibility='hidden';
     chatRuta.style.visibility='visible';
     ruta = route;
+    $("#nombreRuta").html(ruta);
     var loginJson = '{ "action": "login", "user":"'+usuario+'", "route":"'+ruta+'"}';
     
    // client.write(loginJson);
