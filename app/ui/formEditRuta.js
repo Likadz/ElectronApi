@@ -31,7 +31,7 @@ ipcRenderer.send('obtener-datos-editar');
 ipcRenderer.on('datos-edit', (e, r, l) => {
   var ruta = JSON.parse(r);
   laRuta=ruta;
-  console.log("l " + JSON.parse(l)[2]['id']);
+  //console.log("l " + JSON.parse(l)[2]['id']);
   localizacionesEdit = JSON.stringify(JSON.parse(l));
   numLocalizaciones=JSON.parse(l).length;
 
@@ -48,7 +48,7 @@ ipcRenderer.on('datos-edit', (e, r, l) => {
   transporte.value=ruta.transporte;
   tematica.value=ruta.tematica;
   //recorremos las estrellas y las marcamos segun la dificultad 
-  for(i=0;i< $('#dificultad input').length;i++){
+  for(i=1; i<=4;i++){//4=num de las estrellas 
     if(i<=ruta.dificultad){
       $('input[type="radio"][value='+i+']').prop('checked',true);
     }
@@ -345,7 +345,7 @@ function rellenarTabla(){
     //la tabla
     $('#tablaBody').append("<tr id='"+i+"'></tr>");
     $('#tablaBody #'+i).append("<th scope='row'>"+loc[i]['nombre']+"</th><td></td>");
-    $('#tablaBody #'+i+" td").append("<Button type='button' onclick=borrar('"+i+"') ><i class='fa fa-close'></i></Button>");
+    //$('#tablaBody #'+i+" td").append("<Button type='button' onclick=borrar('"+i+"') ><i class='fa fa-close'></i></Button>");
     //variables para el marker del mapa
     var latitud = loc[i]['latitud'];
     var longitud = loc[i]['longitud'];

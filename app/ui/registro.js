@@ -19,14 +19,13 @@ formRegistro.addEventListener('submit', e => {
     conectado:false,
   }
   ipcRenderer.send('create-admin', admin)
-  form.reset();
+  formRegistro.reset();
 });
 
 
 //get todos los adimins
-ipcRenderer.on('new-admin-created', (e, args)=>{
-  console.log(args);
-  ipcRenderer.send('volver-login', 'volver');
+ipcRenderer.on('new-admin-created', (e)=>{
+  ipcRenderer.send('volver-login');
 })
 //boton volver a login
 btnVolver.addEventListener('click', e => {

@@ -8,10 +8,10 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 var idUsuarioConectado;
 var rutaEdit;
 var localizacionEdit;
-
+var win;
 //Creacion de la ventana
 function createWindow() {
-  const win = new BrowserWindow({
+    win = new BrowserWindow({
     width: 500,
     height: 700,
     webPreferences: {
@@ -23,8 +23,8 @@ function createWindow() {
   win.maximize();
   
   //pantalla completa
-  //win.setFullScreen(true)
-  //win.removeMenu();//quitar menu superior
+  win.setFullScreen(true)
+  win.removeMenu();//quitar menu superior
   win.loadFile("app/html/login.html");//html de
 
 }
@@ -38,18 +38,29 @@ ipcMain.on("registro", (e, arg)=>{
 })
 
 //volvemos al login
-ipcMain.on("volver-login", (e, arg)=>{
+ipcMain.on("volver-login", (e)=>{
   BrowserWindow.getFocusedWindow().loadFile('app/html/login.html')//cambiamos el html de la ventana.
 })
 
 //crear un usuario 
-ipcMain.on("create-usuario", async (e, arg) => {
+ipcMain.on("create-admin", async (e, arg) => {
   //const todosusuarios = usuario.find();
-  //console.log(arg);
-  const newusuario = new Usuario(arg);
-  const usuarioSaved = await newusuario.save();
-  //console.log(usuarioSaved);
-  e.reply("new-usuario-created", JSON.stringify(usuarioSaved));
+  var usuario  = JSON.parse(JSON.stringify(arg));
+  const request = await net.request({ 
+    method: 'POST', 
+    protocol: 'http:', 
+    hostname: '127.0.0.1', 
+    port: 8080,
+    path: '/usuarios/add',
+    headers: {
+      'Content-Type': 'application/json'
+    }, 
+    body:usuario,
+  }); 
+  
+  request.write(JSON.stringify(usuario));//enviamos el body
+  request.end();
+  e.reply("new-admin-created");
 });
 
 /* ***************************************************************************************************
@@ -131,8 +142,8 @@ ipcMain.on("exit", async (e, arg) => {
 ***************************************** GENERALES  *************************************************
 *****************************************************************************************************/
 //volver al home desde x pantalla
-ipcMain.on("volver-home", async (e, arg) => {
-  BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
+ipcMain.on("volver-home", async (e) => {
+  win.loadFile('app/html/home.html')//cambiamos el html de la ventana.
 });
 
 /****************************************************************************************************
@@ -140,8 +151,8 @@ ipcMain.on("volver-home", async (e, arg) => {
 *****************************************************************************************************/
 //obtener todas las rutas
 ipcMain.on("get-rutas", async (e, arg) => {
-  //const request = net.request({method:'delete',path:'http://127.0.0.1:8080/rutas/getAll'})
-    request = await net.request({ 
+ 
+  const request =  net.request({ 
     method: 'GET', 
     protocol: 'http:', 
     hostname: '127.0.0.1', 
@@ -162,24 +173,24 @@ ipcMain.on("get-rutas", async (e, arg) => {
         var jsonData = JSON.parse(stringifyChunk);
 
         var otro = JSON.parse(jsonData);//creamos un json de los datos
-        console.log("antes del form de las rutas");
+        console.log("antes del for de las rutas");
         for(let i = 0; i< otro.length; i++){
           rutas.push(otro[i]);
         }
        
-       console.log('Rutas ' + rutas)
-        e.reply("get-rutas",JSON.stringify(rutas));//pasamos las rutas al app.js  para mostrar
+        console.log('Rutas ' + rutas);
+        e.reply("get-rutas",rutas);//pasamos las rutas al app.js  para mostrar
+      //  e.reply("get-rutas",JSON.stringify(rutas));//pasamos las rutas al app.js  para mostrar
       }catch(SyntaxError){
-        console.log("el puto error");
+        console.log("problemas de desencriptado");
         await delay(2000);
-        BrowserWindow.getFocusedWindow().reload();//recargamos la pagina para que vuelva ha hacer la llamda
+        win.loadFile('app/html/home.html')//cambiamos el html de la ventana.
       }
     }
   )}); 
   request.on('uncaughtException', function (error) {
     console.log("problemas");
-    BrowserWindow.getFocusedWindow().reload();//recargamos la pagina para que vuelva ha hacer la llamda
-
+    BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
   });
   request.end();
 
@@ -192,10 +203,6 @@ ipcMain.on("get-rutas", async (e, arg) => {
 });
 //eliminar ruta seleccionada
 ipcMain.on("delete-ruta", async (e, args) => {
-  //const rutaDeleted = await Ruta.findByIdAndDelete(args);
-  //console.log("delete " + args);
-  //const request = net.request('http://127.0.0.1:8080/rutas/deleteId/'+args)
-
   const request = await net.request({ 
     method: 'DELETE', 
     protocol: 'http:', 
@@ -313,7 +320,7 @@ async function obtenerIdRuta(localizacion){
 
  //funcion crear localizacion X
  async function crearLocalizacion(idruta, localizacion){
-   //console.log(localizacion);
+   console.log('Crear localizacion\n'+localizacion);
    //recorremos el array de localizaciones para obtener un json de uno en uno 
    for(let i=0; i< localizacion.length; i++){
      var elBody = JSON.stringify(localizacion[i]);//obtenemos el obj localizacion
@@ -528,18 +535,15 @@ ipcMain.on("chat",async (e)=>{
   request.on('response',  (response) => {
     //cogemos la data 
     response.on('data',async (chunk) => {
-    
-      let rutas=[];//array de usuarios
-      var sChunk=chunk.toString('utf8');//pasamos el buffer a strin tipo utf/
+      console.log("DATA\n"+JSON.parse(chunk.toString('utf8')));
+     /* var sChunk=chunk.toString('utf8');//pasamos el buffer a strin tipo utf/
       var stringifyChunk=JSON.stringify(sChunk);
       var jsonData = JSON.parse(stringifyChunk);
-
+     
       var otro = JSON.parse(jsonData);//creamos un json de los datos
-      for(let i = 0; i< otro.length; i++){
-        rutas.push(otro[i]);
-      }
-
-      e.reply("chat",JSON.stringify(rutas));
+      
+      console.log("Rutas chat\n"+otro);*/
+      e.reply("chat",JSON.parse(chunk.toString('utf8')));
     }
   )}); 
   request.end();

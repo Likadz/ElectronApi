@@ -83,7 +83,7 @@ var placesAutocomplete = places({
 
     $('#localizacionesDeRuta #'+numLocalizaciones).append("<th scope='row'>"+lugar+"</th><td></td>");
 
-    $('#localizacionesDeRuta #'+numLocalizaciones+" td").append("<Button type='button' onclick=borrar('"+numLocalizaciones+"')><em class='fas fa-eraser'></em></Button>");
+    //$('#localizacionesDeRuta #'+numLocalizaciones+" td").append("<Button type='button' onclick=borrar('"+numLocalizaciones+"') ><i class='fa fa-close'></i></Button>");
 
 
     /*****NUEVO QUESTIONARIO*****/

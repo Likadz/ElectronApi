@@ -1,4 +1,6 @@
+$('#Chat').hide();
 const {ipcRenderer } = require("electron");
+window.$ = window.jQuery = require('jquery');
 const { $where } = require("../models/Ruta");
 
 const rutaList = document.querySelector("#rutaList");
@@ -71,9 +73,8 @@ let rutas = [];
 ipcRenderer.send("get-rutas");
 ipcRenderer.on("get-rutas", (e, args) => {
    
-    loading.style.visibility='hidden';
-    const receivedrutas = JSON.parse(args);
-    rutas = receivedrutas;
+   loading.style.visibility='hidden';
+    rutas = args;
     console.log("GET RUTAS " + rutas)
     renderrutas(rutas);
 });
@@ -133,7 +134,7 @@ const btnChat=document.querySelector("#imgChat");
 
 var net = require('net');
 
-var usuario = "Endibra";
+var usuario = "";
 var ruta = "";
 //conexion 
 puerto = 1234;
@@ -147,20 +148,27 @@ puerto = 1234;
 ip = '127.0.0.1' //local
 var client = new net.Socket();
 
+$('#Chat').hide();
+$('.chatImg, .imgVolverChat').on("click", function(e) {
+    $('#Chat').fadeToggle('fast');
+});
+$('#chatRuta').hide();
 //click boton chat
 btnChat.addEventListener('click',e=>{
     ipcRenderer.send('chat');
 });
 //mostramos el chat 
 ipcRenderer.on("chat", (e,arg)=>{
-    menuChat.style.visibility="visible";//activamos la visibilidad
-    renderChatRutas(JSON.parse(arg));//render de la lista de chats existentes
+    //menuChat.style.visibility="visible";//activamos la visibilidad
+  //  $("#Chat").show();
+    renderChatRutas(arg);//render de la lista de chats existentes
 })
 
 
 //Funcion para crear lista de chat rutas
 function renderChatRutas(rutas) {
-    menuChat.style.visibility="visible";//activamos la visibilidad
+    //menuChat.style.visibility="visible";//activamos la visibilidad
+    $("#Chat").show();
     listadoChat.innerHTML = "";
     rutas.map(r => {
         listadoChat.innerHTML += `<li><a href="#"  onclick="conexion('${r.nombre}')">${r.nombre}</a></li>`;
@@ -174,13 +182,17 @@ client.connect(puerto, ip, function() {
 
 //cuando damos volver ocultamos el chat y volvemos a la lista
 volverChat.addEventListener('click',e=>{
-    rutasChat.style.visibility='visible';
-    chatRuta.style.visibility='hidden';
+    $("#rutasChats").show();
+    $("#chatRuta").hide();
+    //rutasChat.style.visibility='visible';
+    //chatRuta.style.visibility='hidden';
 })
 //cuando clica un chat mostramos su conversacion
 function conexion(route) {
-    rutasChat.style.visibility='hidden';
-    chatRuta.style.visibility='visible';
+   // rutasChat.style.visibility='hidden';
+    $("#rutasChats").hide();
+    $("#chatRuta").show();
+   // chatRuta.style.visibility='visible';
     ruta = route;
     $("#nombreRuta").html(ruta);
     var loginJson = '{ "action": "login", "user":"'+usuario+'", "route":"'+ruta+'"}';
@@ -228,10 +240,11 @@ function anadirTexto() {
     if(mensaje != ""){
         escribirTextoInterno(mensaje);
         var content = document.createElement("div");
+        content.className = "chatInterno"
 
-        content.innerHTML = mensaje;
+        content.innerHTML = "Yo: " + mensaje;
     
-        $('#contenidoChat').append(content).append('<hr>');
+        $('#contenidoChat').append(content);
 
         //vaciamos el textarea
         $(".textareaChat").val("");
@@ -242,13 +255,15 @@ function anadirTexto() {
 function anadirTextoExterno(json) {
     if(json["value"] != ""){
         var content = document.createElement("div");
-
+        content.className = "chatExterno"
+        
         //cambiamos
         mensaje = json["value"];
+        usuario = json["from"];
 
-        content.innerHTML = mensaje;
+        content.innerHTML = usuario + ": " + mensaje;
     
-        $('#contenidoChat').append(content).append('<hr>');
+        $('#contenidoChat').append(content);
     }
 }
 

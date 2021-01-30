@@ -57,7 +57,7 @@
 
 
   <!--CHAT -->
-  <div id="Chat" class="menuChat">
+  <div id="Chat" class="menuChat" style="display:none">
             
       <div id="rutasChats">
       <aside class="sidebarChat">
@@ -91,10 +91,7 @@
   <script src="../ui/home.js"></script>
   <!--<script src="../ui/chat.js"></script>-->
   <script>
-        $('.imgVolverChat').on("click", function(e) {
-            $('#Chat').fadeToggle('fast');
-        });
-
+        
         //funcion de autoagrandamiento del text area segun su contenido
         function auto_grow(element) {
             element.style.height = "5px";

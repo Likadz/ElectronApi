@@ -20,14 +20,12 @@ body {
     margin-right: 20%;
     position: absolute;
     top: 0%;
-    right: 5%;
-    visibility: hidden;
-    
+    right: 10%;
 }
 
 .sidebarChat {
     position: fixed;
-    width: 25%;
+    width: 30%;
     height: 100%;
     background: rgba(124, 202, 238, 0.836);
     font-size: 0.65em;
@@ -154,7 +152,19 @@ body {
     margin-bottom: 10px;
 }
   
-
+/*
 #chatRuta{
     visibility: hidden;
+}*/
+
+.chatExterno {
+    background-color: #5e42a6;
+    padding: 1%;
+    margin-bottom: 5px;
+} 
+
+.chatInterno {
+    background-color: chartreuse;
+    padding: 1%;
+    margin-bottom: 5px;
 }
