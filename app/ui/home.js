@@ -137,14 +137,14 @@ var usuario = "Endibra";
 var ruta = "";
 //conexion 
 puerto = 1234;
-ip = '10.10.12.183'//IP Mikel
+//ip = '10.10.12.183'//IP Mikel
 
 //ip servidor
 //ip='13.95.106.247' 
 //puerto chat
 //443
 
-//ip = '127.0.0.1' //local
+ip = '127.0.0.1' //local
 var client = new net.Socket();
 
 //click boton chat

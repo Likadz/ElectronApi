@@ -22,7 +22,7 @@ const tematica = document.querySelector("#tematicaRuta");
 const dificultad=document.querySelector("#dificultad");
 //const imagen=document.querySelector("#imagenRuta");
 var idRuta;
-var idLoc;
+var idLoc=[];
 
 //pedimos los datos
 ipcRenderer.send('obtener-datos-editar');
@@ -31,12 +31,17 @@ ipcRenderer.send('obtener-datos-editar');
 ipcRenderer.on('datos-edit', (e, r, l) => {
   var ruta = JSON.parse(r);
   laRuta=ruta;
-  console.log("l " + l);
+  console.log("l " + JSON.parse(l)[2]['id']);
   localizacionesEdit = JSON.stringify(JSON.parse(l));
   numLocalizaciones=JSON.parse(l).length;
 
   idRuta=ruta['id'];
-  idLoc=JSON.parse(l)['id'];
+  for( let i = 0 ; i < numLocalizaciones; i++){
+    console.log("for " + JSON.parse(l)[i]['id']);
+    idLoc.push(JSON.parse(l)[i]['id']);
+  }
+  //idLoc=JSON.parse(l)['id'];
+  console.log(idLoc);
   nombre.value=ruta['nombre'];
   descripcion.value=ruta['descripcion'];
   ciudad.value=ruta.ciudad;
@@ -296,8 +301,9 @@ function recogerYEnviar(){
     /*console.log("PREGUNTA DATOS "+ JSON.stringify(JSONPregunta));
     var preguntaJSON=[];
     preguntaJSON.push(JSONPregunta);*/
+    console.log(idLoc[i]);
     var JSONLocalizacion = {
-      "id":idLoc,
+      "id":idLoc[i],
       "nombre":$("#h1Lugar"+i).text(),
       "latitud":localizaciones[i][0],
       "longitud":localizaciones[i][1],
@@ -310,8 +316,9 @@ function recogerYEnviar(){
     localizacionesJSON.push(JSONLocalizacion);
     
   }
+  console.log(localizacionesJSON);
   //editamos la ruta
-  ipcRenderer.send('editar-datos',JSONRuta, JSONLocalizacion);
+  ipcRenderer.send('editar-datos',JSONRuta, localizacionesJSON);
   //ipcRenderer.send('actualizar-datos', JSONRuta['id'])
 }
 
