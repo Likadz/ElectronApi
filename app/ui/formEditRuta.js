@@ -138,10 +138,6 @@ function borrar(sitio){
 
 }
 
-function editar(sitio){
-  $("form div").hide();
-  $('#pregunta').show();
-}
 
 
 function showTab(n) {
@@ -332,20 +328,41 @@ function nuevaLocalizacion(){
 
   listaMarker.push(marker);
 }
+
+function editar(sitio){
+  $("#btnEdit"+sitio).prop('disabled', true);
+  $("#btnSave"+sitio).prop('disabled', false);
+  $("#inp"+sitio).prop('disabled', false);
+ 
+}
+function guardar(sitio){
+  JSON.parse(localizacionesEdit)[sitio]['nombre']=$("#inp"+sitio).val();
+
+  $("#btnEdit"+sitio).prop('disabled', false);
+  $("#btnSave"+sitio).prop('disabled', true);
+  $("#inp"+sitio).prop('disabled', true);
+  $("#h1Lugar"+sitio).text($("#inp"+sitio).val());//sustituimos el titulo de la pregunta
+  
+}
+
+
 //Crear la tabla con las localizaciones y los formularios de las preguntas
 function rellenarTabla(){
   
   var loc = JSON.parse(localizacionesEdit);
-  //console.log(loc[0]['nombre']);
+  
   $("#tablaBody").empty();//limpiamos la tabla por si hay datos anteriores
-
+  $('#accordeonPreguntas').empty();
   //recorremos las localizaciones creando una fila para cada uno y una pestaña con formulario 
   for(let i = 0 ; i < loc.length; i++){
     console.log("localizacion " + loc[i]['nombre']);
     //la tabla
     $('#tablaBody').append("<tr id='"+i+"'></tr>");
-    $('#tablaBody #'+i).append("<th scope='row'>"+loc[i]['nombre']+"</th><td></td>");
-    //$('#tablaBody #'+i+" td").append("<Button type='button' onclick=borrar('"+i+"') ><i class='fa fa-close'></i></Button>");
+
+    $('#localizacionesDeRuta #'+i).append("<th scope='row'><input disabled type='text' id='inp"+i+"' value='"+loc[i]['nombre']+"'></th><td></td>");
+    $('#localizacionesDeRuta #'+i+" td").append("<Button id='btnEdit"+i+"' type='button' onclick=editar('"+i+"') ><i class='fa fa-edit'></i></Button>");
+    $('#localizacionesDeRuta #'+i+" td").append("<Button id='btnSave"+i+"' type='button' onclick=guardar('"+i+"') disabled><i class='fa fa-save'></i></Button>");
+    
     //variables para el marker del mapa
     var latitud = loc[i]['latitud'];
     var longitud = loc[i]['longitud'];

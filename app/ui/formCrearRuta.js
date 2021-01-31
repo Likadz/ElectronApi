@@ -81,10 +81,11 @@ var placesAutocomplete = places({
 
     $('#localizacionesDeRuta').append("<tr id='"+numLocalizaciones+"'></tr>");
 
-    $('#localizacionesDeRuta #'+numLocalizaciones).append("<th scope='row'>"+lugar+"</th><td></td>");
+    $('#localizacionesDeRuta #'+numLocalizaciones).append("<th scope='row'><input disabled type='text' id='inp"+numLocalizaciones+"' value='"+lugar+"'></th><td></td>");
 
     //$('#localizacionesDeRuta #'+numLocalizaciones+" td").append("<Button type='button' onclick=borrar('"+numLocalizaciones+"') ><i class='fa fa-close'></i></Button>");
-
+    $('#localizacionesDeRuta #'+numLocalizaciones+" td").append("<Button id='btnEdit"+numLocalizaciones+"' type='button' onclick=editar('"+numLocalizaciones+"') ><i class='fa fa-edit'></i></Button>");
+    $('#localizacionesDeRuta #'+numLocalizaciones+" td").append("<Button id='btnSave"+numLocalizaciones+"' type='button' onclick=guardar('"+numLocalizaciones+"') disabled><i class='fa fa-save'></i></Button>");
 
     /*****NUEVO QUESTIONARIO*****/
 
@@ -159,10 +160,18 @@ function borrar(sitio){
 }
 
 function editar(sitio){
-  $("form div").hide();
-  $('#pregunta').show();
+  $("#btnEdit"+sitio).prop('disabled', true);
+  $("#btnSave"+sitio).prop('disabled', false);
+  $("#inp"+sitio).prop('disabled', false);
+ 
 }
-
+function guardar(sitio){
+  $("#btnEdit"+sitio).prop('disabled', false);
+  $("#btnSave"+sitio).prop('disabled', true);
+  $("#inp"+sitio).prop('disabled', true);
+  $("#h1Lugar"+sitio).text($("#inp"+sitio).val());//sustituimos el titulo de la pregunta
+  
+}
 function salirEditar(){
   window.location.href = 'nuevoForm.html';
 

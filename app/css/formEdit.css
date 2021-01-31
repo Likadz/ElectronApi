@@ -1,20 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+/* GENERAL*/
 
-html{
-  zbackground-image:  url(../resources/fondo_vectorizado.jpg);
- 
+*{
+    font-family: 'Roboto', sans-serif;
 }
-
-body{
+body:before {
+  content: '';
+  position: fixed;
   width: 100vw;
   height: 100vh;
-  background-image:  url(../resources/fondo3.jpg);
+  background-image:  url(../resources/fondo6.jpg);
   background-position: center center;
+  background-repeat: no-repeat;
   background-size: cover;
   z-index: -9;
 }
 
 #regForm {
-  /*background-color: #a3d883;*/
   background-color: rgb(0, 0, 0); /* Fallback color */
   background-color: rgba(0, 0, 0, 0.507); /* Black w/opacity/see-through */
   color: rgb(255, 255, 255);
@@ -23,7 +25,6 @@ body{
   padding: 40px;
   width: 70%;
   min-width: 300px;
-  margin-top: 100px;
 }
 
 /* Style the input fields */
@@ -132,11 +133,6 @@ input[type="radio"]:checked ~ label {
   display: inline;
 }
 
-#container{
-  /*background-color: #5CA4BC;*/
-  
-}
-
 #localizacionesDeRuta{
   background-color: #f1f1f1;
 }
@@ -183,14 +179,14 @@ input[type="radio"]:checked ~ label {
 
 }
 
-/* LEIRE */
+/* boton volver */
 #btnBack{
   width: 4%;
   margin: 1%;
-  xbackground-color: rgba(255, 255, 255, 0.527); /* Black w/opacity/see-through */
+  background-color: rgba(255, 255, 255, 0.527); /* Black w/opacity/see-through */
   border-radius: 50%;
-  xpadding: 1%;
-  xborder: solid 2px rgba(255, 73, 73, 0.295);
+  padding: 1%;
+  border: solid 2px rrgba(7, 7, 7, 0.295)
 }
 #btnBack:hover{
   transform: scale(1.2);

@@ -1,8 +1,9 @@
-body {
-    xbackground-color: green;
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+/* GENERAL*/
 
+*{
+    font-family: 'Roboto', sans-serif;
 }
-
 /********************************/
 /**BARRA DE NAVEGACION DEL CHAT**/
 /********************************/
@@ -152,11 +153,6 @@ body {
     margin-bottom: 10px;
 }
   
-/*
-#chatRuta{
-    visibility: hidden;
-}*/
-
 .chatExterno {
     background-color: #5e42a6;
     padding: 1%;

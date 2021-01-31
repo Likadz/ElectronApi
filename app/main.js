@@ -23,8 +23,8 @@ function createWindow() {
   win.maximize();
   
   //pantalla completa
-  win.setFullScreen(true)
-  win.removeMenu();//quitar menu superior
+  //win.setFullScreen(true)
+  //win.removeMenu();//quitar menu superior
   win.loadFile("app/html/login.html");//html de
 
 }
@@ -34,12 +34,12 @@ function createWindow() {
 *****************************************************************************************************/
 //cargar pantalla
 ipcMain.on("registro", (e, arg)=>{
-  BrowserWindow.getFocusedWindow().loadFile('app/html/registro.html')//cambiamos el html de la ventana.
+  win.loadFile('app/html/registro.html')//cambiamos el html de la ventana.
 })
 
 //volvemos al login
 ipcMain.on("volver-login", (e)=>{
-  BrowserWindow.getFocusedWindow().loadFile('app/html/login.html')//cambiamos el html de la ventana.
+  win.loadFile('app/html/login.html')//cambiamos el html de la ventana.
 })
 
 //crear un usuario 
@@ -102,7 +102,7 @@ ipcMain.on("login", async (e, arg) => {
         }); 
         request.end()
      
-        BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
+        win.loadFile('app/html/home.html')//cambiamos el html de la ventana.
       }else{
         e.reply("login-error","EL USUARIO O CONTRASEÑA SON INCORRECTOS");
         //console.log("EL USUARIO O CONTRASEnA SON INCORRECTOS");
@@ -134,7 +134,7 @@ ipcMain.on("exit", async (e, arg) => {
   request.end()
   idUsuarioConectado="";
   //console.log("LOGOUT");
-  BrowserWindow.getFocusedWindow().loadFile('app/html/login.html')//cambiamos el html de la ventana.
+  win.loadFile('app/html/login.html')//cambiamos el html de la ventana.
 });
 
 
@@ -150,8 +150,7 @@ ipcMain.on("volver-home", async (e) => {
 *************************************** HOME  ********************************************************
 *****************************************************************************************************/
 //obtener todas las rutas
-ipcMain.on("get-rutas", async (e, arg) => {
- 
+ipcMain.on("get-rutas",  (e, arg) => {
   const request =  net.request({ 
     method: 'GET', 
     protocol: 'http:', 
@@ -160,46 +159,31 @@ ipcMain.on("get-rutas", async (e, arg) => {
     path: '/rutas/getAll'
   }); 
 
-  request.on('response',  (response) => {
-  
-    //cogemos la data 
-    response.on('data',async (chunk) => {
-      
+  request.on('response', function (response) {
+    var body = '';
+    response.on('data', function (chunk) {
+      body += chunk;
+    });
+    response.on('end', function () {
+     // console.log('BODY: ' + body);
       try{
         let rutas=[];//array de usuarios
-        
-        var sChunk=chunk.toString('utf8');//pasamos el buffer a strin tipo utf/
-        var stringifyChunk=JSON.stringify(sChunk);
+        var stringifyChunk=JSON.stringify(body);
         var jsonData = JSON.parse(stringifyChunk);
-
         var otro = JSON.parse(jsonData);//creamos un json de los datos
-        console.log("antes del for de las rutas");
         for(let i = 0; i< otro.length; i++){
           rutas.push(otro[i]);
         }
-       
-        console.log('Rutas ' + rutas);
+        
         e.reply("get-rutas",rutas);//pasamos las rutas al app.js  para mostrar
-      //  e.reply("get-rutas",JSON.stringify(rutas));//pasamos las rutas al app.js  para mostrar
       }catch(SyntaxError){
-        console.log("problemas de desencriptado");
-        await delay(2000);
+        console.log("problemas de desencriptado " + SyntaxError);
         win.loadFile('app/html/home.html')//cambiamos el html de la ventana.
       }
-    }
-  )}); 
-  request.on('uncaughtException', function (error) {
-    console.log("problemas");
-    BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
+    });
   });
   request.end();
 
-  /*
-  //SIN LLAMADA A API PERO VA BIEN --> si usamos esto en el home los botones edit/delete tienen que coger el _id no id
-  const rutas = await Ruta.find();
- // console.log("RUTAS FIND " + rutas);
-  e.reply("get-rutas", JSON.stringify(rutas));//pasamos las rutas al app.js
-*/
 });
 //eliminar ruta seleccionada
 ipcMain.on("delete-ruta", async (e, args) => {
@@ -218,8 +202,8 @@ ipcMain.on("delete-ruta", async (e, args) => {
     })
   })
   request.end()
-  //BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
-  BrowserWindow.getFocusedWindow().reload();//recargamos la página
+  //win.loadFile('app/html/home.html')//cambiamos el html de la ventana.
+  win.reload();//recargamos la página
 });
 
 //Filtros de busqueda, obtener rutas por ciudad
@@ -258,15 +242,15 @@ ipcMain.on("buscar", async (e, arg) => {
 *****************************************************************************************************/
 //ir al form de crear ruta
 ipcMain.on("create-ruta-form", async (e, arg) => {
-  BrowserWindow.getFocusedWindow().loadFile('app/html/formCrearRuta.html')//cambiamos el html de la ventana.
+  win.loadFile('app/html/formCrearRuta.html')//cambiamos el html de la ventana.
 });
 
 
 //CREAR RUTA
-ipcMain.on("crear-ruta", async (e, arg) => {
+ipcMain.on("crear-ruta", (e, arg) => {
   var elBody = JSON.stringify(arg);
  // console.log("crear Ruta " + JSON.parse(elBody));
-  const request = await net.request({ 
+  const request = net.request({ 
     method: 'POST', 
     protocol: 'http:', 
     hostname: '127.0.0.1', 
@@ -277,11 +261,14 @@ ipcMain.on("crear-ruta", async (e, arg) => {
     }, 
     body: elBody,
   }); 
-  request.on('response', (response) => {
-    
-    response.on('data', (chunk) => {
-      console.log('RUTA ' + JSON.parse(chunk.toString('utf-8')));
-    })
+  request.on('response', function (response) {
+      var body = '';
+      response.on('data', function (chunk) {
+        body += chunk;
+      });
+      response.on('end', function () {
+        //console.log('RUTA ' + body);
+      });
   })
   request.write(elBody);//enviamos el body
   request.end();
@@ -295,31 +282,36 @@ ipcMain.on("crear-localizacion", (e, arg) => {
 });
 
 //funcion obtener id ultima ruta (la recien creada)
-async function obtenerIdRuta(localizacion){
+function obtenerIdRuta(localizacion){
   // console.log("obtener ultima id ");
    var idRuta="";//var id
-   const request = await net.request({ 
+   const request = net.request({ 
      method: 'GET', 
      protocol: 'http:', 
      hostname: '127.0.0.1', 
      port: 8080,
      path: '/rutas/getUltimaRuta'    
    }); 
-   request.on('response', (response) => {
-     //cogemos la data 
-     response.on('data',async (chunk) => {
-       var ruta=JSON.parse(chunk);
-       idRuta=ruta['id'];//actualizamos la variable con el valor de la id
-       crearLocalizacion(idRuta, localizacion);//llamamos a la funcion para crear la localizacion con la id y la localizacion actual
-     })
-   })
+   request.on('response', function (response) {
+    var body = '';
+    response.on('data', function (chunk) {
+      body += chunk;
+    });
+    response.on('end', function () {
+      //console.log('data\n' + body);
+      var ruta=JSON.parse(body);
+      idRuta=ruta['id'];//actualizamos la variable con el valor de la id
+      crearLocalizacion(idRuta, localizacion);//llamamos a la funcion para crear la localizacion con la id y la localizacion actual
+     
+    });
+  })
    request.end(()=>{
      console.log("request end de obtener ruta " + idRuta);
    });
  }
 
  //funcion crear localizacion X
- async function crearLocalizacion(idruta, localizacion){
+ function crearLocalizacion(idruta, localizacion){
    console.log('Crear localizacion\n'+localizacion);
    //recorremos el array de localizaciones para obtener un json de uno en uno 
    for(let i=0; i< localizacion.length; i++){
@@ -343,12 +335,21 @@ async function obtenerIdRuta(localizacion){
        },
        body: elBody   
      }); 
-     request.on('response', (response) => {
+     /*request.on('response', (response) => {
        //cogemos la data 
        response.on('data', (chunk) => {
          //console.log('localizacion ' + JSON.parse(chunk));
        })
-     })
+     })*/
+     request.on('response', function (response) {
+      var body = '';
+      response.on('data', function (chunk) {
+        body += chunk;
+      });
+      response.on('end', function () {
+        console.log('localizaciones ' + body);
+      });
+    })
      request.write(elBody);
      request.end();
      
@@ -406,7 +407,7 @@ ipcMain.on("edit-ruta-form", async (e, arg) => {
       //get localizaciones
      // var localizacionEdit = rutaEdit['listaLocalizaciones'];
       
-      BrowserWindow.getFocusedWindow().loadFile('app/html/formEditRuta.html')//cambiamos el html de la ventana.
+      win.loadFile('app/html/formEditRuta.html')//cambiamos el html de la ventana.
     })
   })
   request.end();
@@ -506,13 +507,13 @@ ipcMain.on("editar-datos",async (e,arg, loc)=>{
   request.end(async ()=>{
    //e.reply('actualizar-datos');
   });
-  BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
+  win.loadFile('app/html/home.html')//cambiamos el html de la ventana.
   
 });
 
 ipcMain.on('actualizar-datos', async (e,arg)=>{
   await actualizarDatos(arg);//actualizar la lista de las localizaciones de la ruta
-  BrowserWindow.getFocusedWindow().loadFile('app/html/home.html')//cambiamos el html de la ventana.
+  win.loadFile('app/html/home.html')//cambiamos el html de la ventana.
 })
 
 
