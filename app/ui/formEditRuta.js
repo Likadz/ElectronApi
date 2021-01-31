@@ -1,11 +1,13 @@
-const { ipcMain } = require("electron");
+
 const {ipcRenderer } = require("electron");
 //import L from 'leaflet';
 window.$ = window.jQuery = require('jquery');//para usar jquery
 
+//variables principales (la ruta y las localizaciones que vamos a editar);
 var laRuta;
 var localizacionesEdit;
-
+var idRuta;
+var idLoc=[];
 //variables
 var localizaciones = [];
 var listaMarker = [];
@@ -20,9 +22,6 @@ const ciudad = document.querySelector("#ciudadRuta");
 const transporte= document.querySelector("#transporteRuta");
 const tematica = document.querySelector("#tematicaRuta");
 const dificultad=document.querySelector("#dificultad");
-//const imagen=document.querySelector("#imagenRuta");
-var idRuta;
-var idLoc=[];
 
 //pedimos los datos
 ipcRenderer.send('obtener-datos-editar');
@@ -30,18 +29,16 @@ ipcRenderer.send('obtener-datos-editar');
 //rellenamos el formulario
 ipcRenderer.on('datos-edit', (e, r, l) => {
   var ruta = JSON.parse(r);
-  laRuta=ruta;
-  //console.log("l " + JSON.parse(l)[2]['id']);
-  localizacionesEdit = JSON.stringify(JSON.parse(l));
+  laRuta=ruta;//guardamos los datos de la ruta a editar
+  localizacionesEdit = JSON.stringify(JSON.parse(l));//guardamos los datos de las localizaciones a editar
   numLocalizaciones=JSON.parse(l).length;
 
-  idRuta=ruta['id'];
+  idRuta=ruta['id'];//id de la ruta
+  //recorremos las localizaciones para coger las ids de todas y guardarlas en el array
   for( let i = 0 ; i < numLocalizaciones; i++){
-    console.log("for " + JSON.parse(l)[i]['id']);
     idLoc.push(JSON.parse(l)[i]['id']);
   }
-  //idLoc=JSON.parse(l)['id'];
-  console.log(idLoc);
+  //asignamos los valores a las variables (campos del form)
   nombre.value=ruta['nombre'];
   descripcion.value=ruta['descripcion'];
   ciudad.value=ruta.ciudad;
@@ -113,32 +110,9 @@ var placesAutocomplete = places({
   map.on('click', onMapClick);
 
 function pestana(num){
-
   $("#div"+num+" .subdiv").toggle(500);
   $(".subdiv").not("#div"+num+" .subdiv").hide(500);
 }
-
-function borrar(sitio){
-
-  $('#'+sitio).remove();
-  $('#div'+sitio).remove();
-
-  numLocalizaciones--;
-  map.removeLayer(listaMarker[sitio]);
-
-  listaMarker.splice(sitio, 1);
-
-  localizaciones.splice(sitio,1);
-  
-  console.log(sitio);
-
-  console.log(localizaciones);
-  console.log(listaMarker);
-  
-
-}
-
-
 
 function showTab(n) {
   // This function will display the specified tab of the form ...
@@ -230,35 +204,7 @@ function fixStepIndicator(n) {
   x[n].className += " active";
 }
 
-
-
-var placesAutocomplete = places({
-  appId: 'plOJC0RKIYMV',
-  apiKey: '4b3ce3367d9d2a1a12f1d09e32bd0c75',
-  container: document.querySelector('#nombreLocalizacion'),
-  templates: {
-    value: function(suggestion) {
-        map.setView([suggestion.latlng.lat,suggestion.latlng.lng],15);
-    }
-  },
-});
-
-  placesAutocomplete.on('change', e => {
-    map.setView([e.suggestion.latlng.lat,e.suggestion.latlng.lng],15);
-    console.log(e.suggestion.latlng);
-    latlang = e.suggestion.latlng;
-    lugar = e.suggestion.name;
-    $('#nombreLocalizacion').text(lugar);
-  });
-
-  function onMapClick(e) {
-    latlang = e.latlng;
-    lugar = e.name;
-    $('#nombreLocalizacion').text(lugar);
-    nuevaLocalizacion();
-  }
-
-
+//obtenemos los datos nuevos para cambiar
 function recogerYEnviar(){
   var difi;
   for(i=0;i< $('#dificultad input').length;i++){
@@ -267,7 +213,6 @@ function recogerYEnviar(){
     }
   }
 
-  console.log("enviar " + idRuta);
   var JSONRuta =  {
     "id":idRuta,
     "nombre" : nombre.value,
@@ -281,7 +226,6 @@ function recogerYEnviar(){
   };
     
   var localizacionesJSON = [];
- // console.log($('#accordeonPreguntas div').even().length);
  
   for (i = 0; i < $('#accordeonPreguntas div').even().length; i++){
     var JSONPregunta = {
@@ -291,12 +235,9 @@ function recogerYEnviar(){
       "respuesta3" : $("#preguntaC"+i).val(),
       "imagen" : "",
       "tipo" : "pregunta",
-      "correcta" :$( "#respuestaPregunta"+i).val(),
-      
+      "correcta" :$( "#respuestaPregunta"+i).val(),      
     }
-    /*console.log("PREGUNTA DATOS "+ JSON.stringify(JSONPregunta));
-    var preguntaJSON=[];
-    preguntaJSON.push(JSONPregunta);*/
+   
     console.log(idLoc[i]);
     var JSONLocalizacion = {
       "id":idLoc[i],
@@ -312,10 +253,8 @@ function recogerYEnviar(){
     localizacionesJSON.push(JSONLocalizacion);
     
   }
-  console.log(localizacionesJSON);
   //editamos la ruta
-  ipcRenderer.send('editar-datos',JSONRuta, localizacionesJSON);
-  //ipcRenderer.send('actualizar-datos', JSONRuta['id'])
+  ipcRenderer.send('editar-datos',JSONRuta, localizacionesJSON);//editamos los datos
 }
 
 function nuevaLocalizacion(){
@@ -337,7 +276,6 @@ function editar(sitio){
 }
 function guardar(sitio){
   JSON.parse(localizacionesEdit)[sitio]['nombre']=$("#inp"+sitio).val();
-
   $("#btnEdit"+sitio).prop('disabled', false);
   $("#btnSave"+sitio).prop('disabled', true);
   $("#inp"+sitio).prop('disabled', true);
@@ -348,14 +286,12 @@ function guardar(sitio){
 
 //Crear la tabla con las localizaciones y los formularios de las preguntas
 function rellenarTabla(){
-  
   var loc = JSON.parse(localizacionesEdit);
-  
   $("#tablaBody").empty();//limpiamos la tabla por si hay datos anteriores
-  $('#accordeonPreguntas').empty();
+  $('#accordeonPreguntas').empty();//preguntas limpio
   //recorremos las localizaciones creando una fila para cada uno y una pestaña con formulario 
   for(let i = 0 ; i < loc.length; i++){
-    console.log("localizacion " + loc[i]['nombre']);
+    
     //la tabla
     $('#tablaBody').append("<tr id='"+i+"'></tr>");
 
@@ -367,41 +303,31 @@ function rellenarTabla(){
     var latitud = loc[i]['latitud'];
     var longitud = loc[i]['longitud'];
     localizaciones.push([latitud,longitud]);
-  //console.log(localizaciones);
     //mapa
     marker = new L.marker(localizaciones[i]);
     map.addLayer(marker);
     marker.bindPopup('Localizacion '+(i+1)).openPopup();
     listaMarker.push(marker);
 
-    //formulario
-    
     /*****NUEVO QUESTIONARIO*****/
-
     //NOMBRE LOCALIZACION
-
     $('#accordeonPreguntas').append("<div id='div"+i+"'><h1 onclick='pestana("+i+")' id='h1Lugar"+i+"'>"+loc[i]['nombre']+"</h1></div>");    
     
     $("#div"+i).append("<div class='subdiv'> </div>");
 
     //ESCRBIR DESCRIPCION
-
     $("#div"+i+" .subdiv").append("Descripcion: <p><textarea id='descripcionPregunta"+i+"' placeholder='Descripcion' name='' id='' style='resize: none; overflow: auto;'>"+loc[i]['pregunta']['pregunta']+"</textarea></p> ")
 
-    //ESCRBIR PREGUNTA A
-
+    //ESCRBIR RESPUESTA A
     $("#div"+i+" .subdiv").append("Pregunta A:<p><input id='preguntaA"+i+"' placeholder='Pregunta A' oninput='' value='"+loc[i]['pregunta']['respuesta1']+"'></p> ");
 
-    //ESCRBIR PREGUNTA B
-
+    //ESCRBIR RESPUESTA B
     $("#div"+i+" .subdiv").append("Pregunta B:<p><input id='preguntaB"+i+"' placeholder='Pregunta B' oninput='' value='"+loc[i]['pregunta']['respuesta2']+"'></p>");
 
-    //ESCRBIR PREGUNTA C
-
+    //ESCRBIR RESPUESTA C
     $("#div"+i+" .subdiv").append("Pregunta C:<p><input id='preguntaC"+i+"' placeholder='Pregunta C' oninput='' value='"+loc[i]['pregunta']['respuesta3']+"'></p> ");
  
     //ESCRBIR IMAGEN
-
     //$("#div"+i+" .subdiv").append("Imagen:<p><input id='imagenPregunta"+i+"' type='file' ></p>");
 
     

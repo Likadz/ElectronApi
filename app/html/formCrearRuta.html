@@ -16,57 +16,58 @@
   <img src="../resources/back-arrow.png" id="btnBack">
   <div id="container">
     <form id="regForm" action="">
-        <h1 id="titulo">Nueva Ruta</h1>
-        <!-- One "tab" for each step in the form: -->
-        <!-- NUEVA RUTA -->
-        <div class="tab">
-            Nombre de la ruta:
-            <input id="nombreRuta" placeholder="Nombre de la ruta" oninput="this.className = '' " ></p>
-            Descripcion:
-            <p><textarea id="descripcionRuta" placeholder="Descripcion" name=""  style="resize: none; overflow: auto;"></textarea></p>
-            Imagen:
-            <p><input id="imagenRuta" type="file"></p>
+      <h1 id="titulo">Nueva Ruta</h1>
+      <!-- One "tab" for each step in the form: -->
+      <!-- NUEVA RUTA -->
+      <div class="tab">
+        Nombre de la ruta:
+        <input id="nombreRuta" placeholder="Nombre de la ruta" oninput="this.className = '' " ></p>
+        Descripcion:
+        <p><textarea id="descripcionRuta" placeholder="Descripcion" name=""  style="resize: none; overflow: auto;"></textarea></p>
+        Imagen:
+        <p><input id="imagenRuta" type="file"></p>
 
-            <p><select id="ciudadRuta" class="form-select" aria-label="Default select example">
-                <option selected>Ciudad</option>
-                <option value="Andoain" >Andoain</option>
-                <option value="Donostia">Donostia</option>
-                <option value="Irun">Irun</option>
-              </select></p>
+        <p><select id="ciudadRuta" class="form-select" aria-label="Default select example">
+            <option selected>Ciudad</option>
+            <option value="Andoain" >Andoain</option>
+            <option value="Donostia">Donostia</option>
+            <option value="Irun">Irun</option>
+            <option value="Errenteria">Errenteria</option>
+            <option value="Pamplona">Pamplona</option>
+            <option value="Bilbo">Bilbo</option>
+          </select></p>
 
-            <p><select id="transporteRuta" class="form-select" aria-label="Default select example">
-                <option selected>Transporte</option>
-                <option value="Andando">Andando</option>
-                <option value="Bici">Bici</option>
-                <option value="Coche/moto">Coche/moto</option>
-            </select></p> 
+        <p><select id="transporteRuta" class="form-select" aria-label="Default select example">
+            <option selected>Transporte</option>
+            <option value="Andando">Andando</option>
+            <option value="Bici">Bici</option>
+            <option value="Coche/moto">Coche/moto</option>
+        </select></p> 
 
-            <p><select id="tematicaRuta" class="form-select" aria-label="Default select example">
-                <option selected>Tematica</option>
-                <option value="Comida">Comida</option>
-                <option value="Turismo">Turismo</option>
-                <option value="Lugares ocultos">Lugares ocultos</option>
-            </select></p>
-            
-            Dificultad:
-            <p id="dificultad" class="clasificacion">
-              <input id="dificultadRuta1" type="radio" name="estrellas" value="3">
-              <label for="dificultadRuta1">★</label>
-              <input id="dificultadRuta2" type="radio" name="estrellas" value="2">
-              <label for="dificultadRuta2">★</label>
-              <input id="dificultadRuta3" type="radio" name="estrellas" value="1">
-              <label for="dificultadRuta3">★</label>
-            </p>
+        <p><select id="tematicaRuta" class="form-select" aria-label="Default select example">
+            <option selected>Tematica</option>
+            <option value="Comida">Comida</option>
+            <option value="Turismo">Turismo</option>
+            <option value="Lugares ocultos">Lugares ocultos</option>
+        </select></p>
+        
+        Dificultad:
+        <p id="dificultad" class="clasificacion">
+          <input id="dificultadRuta1" type="radio" name="estrellas" value="3">
+          <label for="dificultadRuta1">★</label>
+          <input id="dificultadRuta2" type="radio" name="estrellas" value="2">
+          <label for="dificultadRuta2">★</label>
+          <input id="dificultadRuta3" type="radio" name="estrellas" value="1">
+          <label for="dificultadRuta3">★</label>
+        </p>
+      </div>
 
+      <!-- NUEVA LOCALIZACION -->
+      <div class="tab">
+        <div id="searchBar">
+          <p><input type="search" id="nombreLocalizacion" oninput="this.className = ''" placeholder="Where are we going?" /><button type="button" id="botonBuscar" class="btn btn-primary" onclick="nuevaLocalizacion()">Buscar</button></p>
         </div>
-
-
-        <!-- NUEVA LOCALIZACION -->
-        <div class="tab">
-          <div id="searchBar">
-            <p><input type="search" id="nombreLocalizacion" oninput="this.className = ''" placeholder="Where are we going?" /><button type="button" id="botonBuscar" class="btn btn-primary" onclick="nuevaLocalizacion()">Buscar</button></p>
-          </div>
-          <div id="mapid"></div>
+        <div id="mapid"></div>
           <table class="table" id="localizacionesDeRuta">
             <thead>
               <tr>
@@ -78,60 +79,27 @@
             </tbody>
           </table>
         </div>     
+      </div>
+      <!-- PREGUNTA -->
+      <div class="tab">
+        <div id="accordeonPreguntas"></div>
+      </div>
+
+      <!-- BOTONES -->
+      <div style="overflow:auto;">
+        <div style="float:right;margin-right: 15%; margin-top: 10px;">
+          <button type="button" id="prevBtn" class="btn btn-secondary" onclick="nextPrev(-1)">Anterior</button>
+          <button type="button" id="nextBtn" class="btn btn-primary" onclick="nextPrev(1)">Siguiente</button>
         </div>
-        
-      
-        <!-- PREGUNTA -->
-        <div class="tab">
-
-          <div id="accordeonPreguntas"></div>
-
-         <!-- Elige una ruta:
-          Descripcion:
-            <p><textarea id="descripcionPregunta" placeholder="Descripcion" name="" id="" style="resize: none; overflow: auto;"></textarea></p>
-          Pregunta A:
-            <p><input id="preguntaA" placeholder="Pregunta A" oninput="this.className = '' " ></p>
-          Pregunta B:
-            <p><input id="preguntaB" placeholder="Pregunta B" oninput="this.className = '' " ></p>
-          Pregunta C:
-            <p><input id="preguntaC" placeholder="Pregunta C" oninput="this.className = '' " ></p>
-          Imagen:
-            <p><input id="imagenPregunta" type="file"></p>
-          
-          <p><input type="radio" name="tipo" id="Pregunta">
-          <label for="Pregunta">Pregunta</label></p>
-          <p><input type="radio" name="tipo" id="Localizacion">
-          <label for="Localizacion">Localizacion</label></p>
-
-          Respuesta correcta:
-          <p><select id="respuestaPregunta" class="form-select" aria-label="Default select example">
-            <option selected>Respuesta correcta</option>
-            <option value="1">A</option>
-            <option value="2">B</option>
-            <option value="3">C</option>
-        </select></p>-->
-        </div>
-
-        <!-- BOTONES -->
-        <div style="overflow:auto;">
-          <div style="float:right;margin-right: 15%; margin-top: 10px;">
-            <button type="button" id="prevBtn" class="btn btn-secondary" onclick="nextPrev(-1)">Anterior</button>
-            <button type="button" id="nextBtn" class="btn btn-primary" onclick="nextPrev(1)">Siguiente</button>
-          </div>
-        </div>
-
-
-        <!-- Circles which indicates the steps of the form: -->
-        <div style="text-align:center;margin-top:40px;">
-          <span class="step"></span>
-          <span class="step"></span>
-          <span class="step"></span>
-        </div>
-       
-        
-</form>
-
-</div>
+      </div>
+      <!-- Circles which indicates the steps of the form: -->
+      <div style="text-align:center;margin-top:40px;">
+        <span class="step"></span>
+        <span class="step"></span>
+        <span class="step"></span>
+      </div>
+    </form>
+  </div>
 
 </body>
 </html>

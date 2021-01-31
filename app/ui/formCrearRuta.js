@@ -1,19 +1,8 @@
 //import L from 'leaflet';
 window.$ = window.jQuery = require('jquery');
 
-//Obtener las ciudades de la base de datos
 const {ipcRenderer } = require("electron");
-/*ipcRenderer.send('getCiudades');
-ipcRenderer.on("busqueda-ciudades", (e, args) => {
-  const ciudades = JSON.parse(args);
-  console.log("las ciudades " +ciudades);
-  for(let i=0; i<ciudades.length; i++){
-    //añadir las ciudades al selector
-    var o = new Option(ciudades[i], ciudades[i]);//creamos una opcion
-    $(o).html(ciudades[i]);
-    $("#ciudadRuta").append(o);//la añadimos al selector
-  }
-});*/
+
 const btnVolver = document.querySelector("#btnBack");
 //boton volver a home
 btnVolver.addEventListener('click', e => {
@@ -32,6 +21,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
     attribution: '&copy; <a>OpenStreetMap</a> contributors'
 }).addTo(map);
 
+//variables
 var latlang;
 var lugar;
 var localizaciones = [];
@@ -57,6 +47,7 @@ var placesAutocomplete = places({
     $('#nombreLocalizacion').text(lugar);
   });
 
+  //funcion para crear una localizacion si clica en el mapa
   function onMapClick(e) {
     latlang = e.latlng;
     lugar = e.name;
@@ -66,6 +57,7 @@ var placesAutocomplete = places({
 
   map.on('click', onMapClick);
   
+  //añadir localizacion a la lista y añadirla a la tabla de localizaciones
   function nuevaLocalizacion(){
     localizaciones.push([latlang.lat,latlang.lng]);
     console.log(localizaciones);
@@ -76,43 +68,35 @@ var placesAutocomplete = places({
 
     listaMarker.push(marker);
 
-
+    
     /*****NUEVA FILA TABLA*****/
 
-    $('#localizacionesDeRuta').append("<tr id='"+numLocalizaciones+"'></tr>");
-
+    $('#localizacionesDeRuta').append("<tr id='"+numLocalizaciones+"'></tr>");//la fila
+    //campo nombre
     $('#localizacionesDeRuta #'+numLocalizaciones).append("<th scope='row'><input disabled type='text' id='inp"+numLocalizaciones+"' value='"+lugar+"'></th><td></td>");
-
-    //$('#localizacionesDeRuta #'+numLocalizaciones+" td").append("<Button type='button' onclick=borrar('"+numLocalizaciones+"') ><i class='fa fa-close'></i></Button>");
+    //botones edit y save
     $('#localizacionesDeRuta #'+numLocalizaciones+" td").append("<Button id='btnEdit"+numLocalizaciones+"' type='button' onclick=editar('"+numLocalizaciones+"') ><i class='fa fa-edit'></i></Button>");
     $('#localizacionesDeRuta #'+numLocalizaciones+" td").append("<Button id='btnSave"+numLocalizaciones+"' type='button' onclick=guardar('"+numLocalizaciones+"') disabled><i class='fa fa-save'></i></Button>");
 
     /*****NUEVO QUESTIONARIO*****/
 
     //NOMBRE LOCALIZACION
-
     $('#accordeonPreguntas').append("<div id='div"+numLocalizaciones+"'><h1 onclick='pestana("+numLocalizaciones+")' id='h1Lugar"+numLocalizaciones+"'>"+lugar+"</h1></div>");    
-    
     $("#div"+numLocalizaciones).append("<div class='subdiv'> </div>");
 
     //ESCRBIR DESCRIPCION
-
     $("#div"+numLocalizaciones+" .subdiv").append("Descripcion: <p><textarea id='descripcionPregunta"+numLocalizaciones+"' placeholder='Descripcion' name='' id='' style='resize: none; overflow: auto;'></textarea></p> ")
 
-    //ESCRBIR PREGUNTA A
-
+    //ESCRBIR RESPUESTA A
     $("#div"+numLocalizaciones+" .subdiv").append("Pregunta A:<p><input id='preguntaA"+numLocalizaciones+"' placeholder='Pregunta A' oninput=''></p> ");
 
-    //ESCRBIR PREGUNTA B
-
+    //ESCRBIR RESPUESTA B
     $("#div"+numLocalizaciones+" .subdiv").append("Pregunta B:<p><input id='preguntaB"+numLocalizaciones+"' placeholder='Pregunta B' oninput=''></p>");
 
-    //ESCRBIR PREGUNTA C
-
+    //ESCRBIR RESPUESTA C
     $("#div"+numLocalizaciones+" .subdiv").append("Pregunta C:<p><input id='preguntaC"+numLocalizaciones+"' placeholder='Pregunta C' oninput=''></p> ");
  
     //ESCRBIR IMAGEN
-
     $("#div"+numLocalizaciones+" .subdiv").append("Imagen:<p><input id='imagenPregunta"+numLocalizaciones+"' type='file' ></p>");
 
     //ELEGIR TIPO PREGUNTA
@@ -120,8 +104,6 @@ var placesAutocomplete = places({
     $("#div"+numLocalizaciones+" .subdiv").append("<p><input type='radio' name='tipo' id='Localizacion"+numLocalizaciones+"'><label for='Localizacion"+numLocalizaciones+"'>Localizacion</label></p>");
 
     //ELEGIR RESPUESTA CORRECTA
-
-    //$("#div"+numLocalizaciones+" .subdiv").append("Respuesta correcta:    <p><select id='respuestaPregunta"+numLocalizaciones+"' class='form-select' aria-label='Default select example'> <option selected>selecciona la respuesta correcta</option>  <option value='1'>A</option>      <option value='2'>B</option>      <option value='3'>C</option>  </select></p>");
     $("#div"+numLocalizaciones+" .subdiv").append(`Respuesta correcta:<p><select id='respuestaPregunta${numLocalizaciones}' name='respuestaPregunta${numLocalizaciones}' class='form-select' aria-label='Default select example'><option selected>selecciona la respuesta correcta</option><option value='1'>A</option><option value='2'>B</option><option value='3'>C</option></select></p>` );
 
     $("#div"+numLocalizaciones+" .subdiv").hide();
@@ -134,47 +116,22 @@ var placesAutocomplete = places({
   
 
 function pestana(num){
-  
   $("#div"+num+" .subdiv").toggle(500);
   $(".subdiv").not("#div"+num+" .subdiv").hide(500);
 }
 
-function borrar(sitio){
-
-  $('#'+sitio).remove();
-  $('#div'+sitio).remove();
-
-  numLocalizaciones--;
-  map.removeLayer(listaMarker[sitio]);
-
-  listaMarker.splice(sitio, 1);
-
-  localizaciones.splice(sitio,1);
-  
-  console.log(sitio);
-
-  console.log(localizaciones);
-  console.log(listaMarker);
-  
-
-}
-
+//funcion editar nombre de la localizacion
 function editar(sitio){
   $("#btnEdit"+sitio).prop('disabled', true);
   $("#btnSave"+sitio).prop('disabled', false);
-  $("#inp"+sitio).prop('disabled', false);
- 
+  $("#inp"+sitio).prop('disabled', false); 
 }
+//guardar nombre de la localizacion
 function guardar(sitio){
   $("#btnEdit"+sitio).prop('disabled', false);
   $("#btnSave"+sitio).prop('disabled', true);
   $("#inp"+sitio).prop('disabled', true);
-  $("#h1Lugar"+sitio).text($("#inp"+sitio).val());//sustituimos el titulo de la pregunta
-  
-}
-function salirEditar(){
-  window.location.href = 'nuevoForm.html';
-
+  $("#h1Lugar"+sitio).text($("#inp"+sitio).val());//sustituimos el titulo de la pregunta  
 }
 
 function showTab(n) {
@@ -235,25 +192,6 @@ function nextPrev(n) {
 }
 
 function validateForm() {
-  /*// This function deals with validation of the form fields
-  var x, y, i, valid = true;
-  x = document.getElementsByClassName("tab");
-  y = x[currentTab].getElementsByTagName("input");
-  // A loop that checks every input field in the current tab:
-  for (i = 0; i < y.length; i++) {
-    // If a field is empty...
-    if (y[i].value == "") {
-      // add an "invalid" class to the field:
-      y[i].className += " invalid";
-      // and set the current valid status to false:
-      valid = false;
-    }
-  }
-  // If the valid status is true, mark the step as finished and valid:
-  if (valid) {
-    document.getElementsByClassName("step")[currentTab].className += " finish";
-  }
-  return valid; // return the valid status*/
   return true;
 }
 
@@ -267,17 +205,15 @@ function fixStepIndicator(n) {
   x[n].className += " active";
 }
 
-
+//Coger los datos y pasarlos al main para introducirlos a la base de datos
 function recogerYEnviar(){
-  var difi;
+  var difi;//variable dificultad 
   for(i=0;i<$('#dificultad input').length;i++){
     if($('#dificultad input')[i].checked){
-      difi = $('#dificultad input')[i].value;
+      difi = $('#dificultad input')[i].value;//dibujamos la estrella
     }
   }
-  if($('#imagenRuta').val()==null){
-    $('#imagenRuta').val('foto.jpg');
-  }
+  //JSON ruta
   var JSONRuta =  {
     "nombre" : $('#nombreRuta').val(),
     "descripcion" : $('#descripcionRuta').val(),
@@ -288,11 +224,10 @@ function recogerYEnviar(){
     "dificultad":difi,
     "listaLocalizaciones":[],
   };
-  //console.log("RUTAS JSON " + JSON.stringify(JSONRuta));
 
+  //array de localizaciones
   var localizacionesJSON = [];
- // console.log($('#accordeonPreguntas div').even().length);
- 
+
   for (i = 0; i < $('#accordeonPreguntas div').even().length; i++){
     var JSONPregunta = {
       "pregunta" :  $("#descripcionPregunta"+i).val(),
@@ -304,9 +239,6 @@ function recogerYEnviar(){
       "correcta" :$( "#respuestaPregunta"+i).val(),
       
     }
-    /*console.log("PREGUNTA DATOS "+ JSON.stringify(JSONPregunta));
-    var preguntaJSON=[];
-    preguntaJSON.push(JSONPregunta);*/
     var JSONLocalizacion = {
       "nombre":$("#h1Lugar"+i).text(),
       "latitud":localizaciones[i][0],
@@ -316,16 +248,12 @@ function recogerYEnviar(){
       "rutaId":"0",
       "pregunta":JSONPregunta,
     }
-
-    localizacionesJSON.push(JSONLocalizacion);
-    
+    localizacionesJSON.push(JSONLocalizacion);//añadimos el json a la lista 
   }
   
-  console.log(localizacionesJSON);
-  ipcRenderer.send('crear-ruta',JSONRuta);
-  ipcRenderer.send('crear-localizacion',localizacionesJSON);
+  ipcRenderer.send('crear-ruta',JSONRuta);//creamos la ruta en la ddbb
+  ipcRenderer.send('crear-localizacion',localizacionesJSON);//creamos la localizaicon en la ddbb
   
-
   //volvemos al home
   ipcRenderer.send("volver-home");
       

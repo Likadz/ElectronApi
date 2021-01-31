@@ -8,7 +8,6 @@ const apellido = document.querySelector("#apellidoRegistro");
 const btnVolver = document.querySelector("#imgVolver");
 
 formRegistro.addEventListener('submit', e => {
-  console.log("registrar");
   e.preventDefault(); 
   const admin ={
     usuario:nick.value,

@@ -16,22 +16,18 @@ formLogin.addEventListener('submit', e => {
     rol:"admin",
     conectado:false,
   }
-  //ipcRenderer.send('create-usuario', usuario)
-  console.log("login pulsado");
   ipcRenderer.send('login', usuario)//enviamos el usuario con los datos al main
-  //console.log(taskName.value , taskDescription.value);
   form.reset();
 });
 
 rutaRegistro.addEventListener('click', function(){
-  console.log("registro");
   ipcRenderer.send('registro','registro');
 });
 
 
 //get todos los adimins
 ipcRenderer.on('new-usuario-created', (e, args)=>{
-  console.log(args);
+  //console.log(args);
 })
 
 //login error

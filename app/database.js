@@ -7,7 +7,7 @@ mongoose.connect('mongodb+srv://Josu:Plaiaundi2020@clusterjosu.zcvkx.mongodb.net
   .then(db => console.log('DB is connected'))
   .catch(err => console.log(err));
 
-/*
+/*Conexion local
 mongoose.connect('mongodb://localhost/reto', {
   useNewUrlParser: true,
   useUnifiedTopology: true
