@@ -67,7 +67,7 @@ let rutas = [];
 
 ipcRenderer.send("get-rutas");
 ipcRenderer.on("get-rutas", (e, args) => {
-   loading.style.visibility='hidden';
+    loading.style.visibility='hidden';
     rutas = args;
     renderrutas(rutas);
 });

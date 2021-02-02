@@ -189,9 +189,11 @@ ipcMain.on("delete-ruta", async (e, args) => {
     //cogemos la data 
     response.on('data', (chunk) => {
     })
+    response.on('end',()=>{
+      e.reply("delete-ruta-success");
+    });
   })
-  request.end().
-  win.reload();//recargamos la página
+  request.end();
 });
 
 //Filtros de busqueda, obtener rutas por ciudad
@@ -289,28 +291,29 @@ function obtenerIdRuta(localizacion){
 
  //funcion crear localizacion X
  function crearLocalizacion(idruta, localizacion){
-   console.log('Crear localizacion\n'+localizacion);
+   //console.log('Crear localizacion\n'+localizacion);
    //recorremos el array de localizaciones para obtener un json de uno en uno 
    for(let i=0; i< localizacion.length; i++){
-     var elBody = JSON.stringify(localizacion[i]);//obtenemos el obj localizacion
-     
-     var json=JSON.parse(elBody);//creamos un json con el obj
-     json.rutaId=idruta;//modificamos el key 'rutaId'
-     elBody=JSON.stringify(json);//volvemos a asignar al body los datos
- 
-     //hacemos la llamada mandando el body
-     const request = net.request({ 
-       method: 'POST', 
-       protocol: 'http:', 
-       hostname: '127.0.0.1', 
-       port: 8080,
-       path: '/localizaciones/add',
-       headers: {
-         'Content-Type': 'application/json'
-       },
-       body: elBody   
-     }); 
-     request.on('response', function (response) {
+    console.log('Crear localizacion\n'+localizacion[i]);
+    var elBody = JSON.stringify(localizacion[i]);//obtenemos el obj localizacion
+    
+    var json=JSON.parse(elBody);//creamos un json con el obj
+    json.rutaId=idruta;//modificamos el key 'rutaId'
+    elBody=JSON.stringify(json);//volvemos a asignar al body los datos
+
+    //hacemos la llamada mandando el body
+    const request = net.request({ 
+      method: 'POST', 
+      protocol: 'http:', 
+      hostname: '127.0.0.1', 
+      port: 8080,
+      path: '/localizaciones/add',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: elBody   
+    }); 
+    request.on('response', function (response) {
       var body = '';
       response.on('data', function (chunk) {
         body += chunk;
@@ -319,8 +322,8 @@ function obtenerIdRuta(localizacion){
         console.log('localizaciones ' + body);
       });
     })
-     request.write(elBody);
-     request.end();
+    request.write(elBody);
+    request.end();
      
    }
    actualizarDatos(idruta);//funcion para actualizar la lista de localizaciones de la ruta
@@ -456,7 +459,7 @@ ipcMain.on("editar-datos",async (e,arg, loc)=>{
   }); 
   request.write(bodyRuta);
   request.end(async ()=>{
-   //e.reply('actualizar-datos');
+   e.reply('actualizar-datos');
   });
   win.loadFile('app/html/home.html')//cambiamos el html de la ventana.
   
@@ -484,7 +487,7 @@ ipcMain.on("chat",async (e)=>{
   request.on('response',  (response) => {
     //cogemos la data 
     response.on('data',async (chunk) => {
-      console.log("DATA\n"+JSON.parse(chunk.toString('utf8')));
+      //console.log("DATA\n"+JSON.parse(chunk.toString('utf8')));
       e.reply("chat",JSON.parse(chunk.toString('utf8')));
     }
   )}); 
