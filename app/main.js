@@ -203,20 +203,19 @@ ipcMain.on("buscar", async (e, arg) => {
   const request = net.request(`http://${ip}:8080/apiMongo/rutas/getCiudad/${arg}`)
   request.on('response', (response) => {
     //cogemos la data 
-    response.on('data', (chunk) => {
-      let rutas=[];//array de usuarios
-      
-      var sChunk=chunk.toString('utf8');
-      var stringifyChunk=JSON.stringify(sChunk);
-      var jsonData = JSON.parse(stringifyChunk);
-      var otro = JSON.parse(jsonData);
-
+    var body = '';
+    response.on('data', function (chunk) {
+      body += chunk;
+    });
+    response.on('end', function () {
+      let rutas=[];//array de usuarios      
+      var otro = JSON.parse(body);
       for(let i = 0; i< otro.length; i++){
         rutas.push(new Ruta(otro[i]));//por cada elemento de la data parseada creamos un usuario en el array
       }
       e.reply("busqueda-realizada", JSON.stringify(rutas));//pasamos las rutas al app.js
-
     })
+   
   })
   request.end()
 });
