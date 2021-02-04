@@ -121,7 +121,7 @@ const btnChat=document.querySelector("#imgChat");
 
 var net = require('net');
 
-var usuario = "admin";
+var usuario = "admin";//debe ser el nick del administrador.
 var ruta = "";
 //conexion 
 //puerto = 1234;
