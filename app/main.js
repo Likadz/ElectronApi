@@ -8,6 +8,8 @@ var idUsuarioConectado;
 var rutaEdit;
 var localizacionEdit;
 var win;
+
+var ip='13.95.106.247';
 //Creacion de la ventana
 function createWindow() {
     win = new BrowserWindow({
@@ -47,9 +49,9 @@ ipcMain.on("create-admin", async (e, arg) => {
   const request = await net.request({ 
     method: 'POST', 
     protocol: 'http:', 
-    hostname: '127.0.0.1', 
+    hostname: ip, 
     port: 8080,
-    path: '/usuarios/add',
+    path: '/apiMongo/usuarios/add',
     headers: {
       'Content-Type': 'application/json'
     }, 
@@ -71,15 +73,15 @@ ipcMain.on("login", async (e, arg) => {
   const request = net.request({ 
     method: 'GET', 
     protocol: 'http:', 
-    hostname: '127.0.0.1', 
+    hostname: ip, 
     port: 8080,
-    path: '/usuarios/getLogin/'+usuario.nombre +'/'+usuario.contrasena+'/'+usuario.rol,
+    path: '/apiMongo/usuarios/getLogin/'+usuario.nombre +'/'+usuario.contrasena+'/'+usuario.rol,
     
   }); 
   //respuesta de la llamada a la api
   request.on('response', (response) => {
     response.on('error', (error) => {
-      e.reply("login-error","EL USUARIO O CONTRASEnA SON INCORRECTOS");
+      e.reply("login-error","EL USUARIO O CONTRASEÑA SON INCORRECTOS");
     })
     //cogemos la data 
     response.on('data', (chunk) => {
@@ -90,9 +92,9 @@ ipcMain.on("login", async (e, arg) => {
         const request = net.request({ 
           method: 'PUT', 
           protocol: 'http:', 
-          hostname: '127.0.0.1', 
+          hostname: ip, 
           port: 8080,
-          path: 'usuarios/conectarUsuario/'+ idUsuarioConectado   
+          path: '/apiMongousuarios/conectarUsuario/'+ idUsuarioConectado   
         }); 
         request.end()
      
@@ -118,9 +120,9 @@ ipcMain.on("exit", async (e, arg) => {
   const request = net.request({ 
     method: 'PUT', 
     protocol: 'http:', 
-    hostname: '127.0.0.1', 
+    hostname: ip, 
     port: 8080,
-    path: 'usuarios/desconectarUsuario/'+ idUsuarioConectado   
+    path: '/apiMongousuarios/desconectarUsuario/'+ idUsuarioConectado   
   }); 
   request.end()
   idUsuarioConectado="";
@@ -144,9 +146,9 @@ ipcMain.on("get-rutas",  (e, arg) => {
   const request =  net.request({ 
     method: 'GET', 
     protocol: 'http:', 
-    hostname: '127.0.0.1', 
+    hostname: ip, 
     port: 8080,
-    path: '/rutas/getAll'
+    path: '/apiMongo/rutas/getAll'
   }); 
 
   request.on('response', function (response) {
@@ -180,9 +182,9 @@ ipcMain.on("delete-ruta", async (e, args) => {
   const request = await net.request({ 
     method: 'DELETE', 
     protocol: 'http:', 
-    hostname: '127.0.0.1', 
+    hostname: ip, 
     port: 8080,
-    path: 'rutas/deleteId/'+args
+    path: '/apiMongo/rutas/deleteId/'+args
     
   }); 
   request.on('response', (response) => {
@@ -198,7 +200,7 @@ ipcMain.on("delete-ruta", async (e, args) => {
 
 //Filtros de busqueda, obtener rutas por ciudad
 ipcMain.on("buscar", async (e, arg) => {
-  const request = net.request('http://127.0.0.1:8080/rutas/getCiudad/'+arg)
+  const request = net.request(`http://${ip}:8080/apiMongo/rutas/getCiudad/${arg}`)
   request.on('response', (response) => {
     //cogemos la data 
     response.on('data', (chunk) => {
@@ -235,9 +237,9 @@ ipcMain.on("crear-ruta", (e, arg) => {
   const request = net.request({ 
     method: 'POST', 
     protocol: 'http:', 
-    hostname: '127.0.0.1', 
+    hostname: ip, 
     port: 8080,
-    path: '/rutas/add',
+    path: '/apiMongo/rutas/add',
     headers: {
       'Content-Type': 'application/json'
     }, 
@@ -268,9 +270,9 @@ function obtenerIdRuta(localizacion){
    const request = net.request({ 
      method: 'GET', 
      protocol: 'http:', 
-     hostname: '127.0.0.1', 
+     hostname: ip, 
      port: 8080,
-     path: '/rutas/getUltimaRuta'    
+     path: '/apiMongo/rutas/getUltimaRuta'    
    }); 
    request.on('response', function (response) {
     var body = '';
@@ -305,9 +307,9 @@ function obtenerIdRuta(localizacion){
     const request = net.request({ 
       method: 'POST', 
       protocol: 'http:', 
-      hostname: '127.0.0.1', 
+      hostname: ip, 
       port: 8080,
-      path: '/localizaciones/add',
+      path: '/apiMongo/localizaciones/add',
       headers: {
         'Content-Type': 'application/json'
       },
@@ -334,9 +336,9 @@ function obtenerIdRuta(localizacion){
    const request = net.request({ 
      method: 'PUT', 
      protocol: 'http:', 
-     hostname: '127.0.0.1', 
+     hostname: ip, 
      port: 8080,
-     path: '/rutas/editIdListado/'+id,
+     path: '/apiMongo/rutas/editIdListado/'+id,
      headers: {
        'Content-Type': 'application/json'
      },   
@@ -363,9 +365,9 @@ ipcMain.on("edit-ruta-form", async (e, arg) => {
   const request = await net.request({ 
     method: 'GET', 
     protocol: 'http:', 
-    hostname: '127.0.0.1', 
+    hostname: ip, 
     port: 8080,
-    path: '/rutas/getId/'+arg    
+    path: '/apiMongo/rutas/getId/'+arg    
   }); 
   request.on('response', (response) => {
     //cogemos la data 
@@ -388,9 +390,9 @@ ipcMain.on('obtener-datos-editar',async (e)=>{
     const request = await net.request({ 
       method: 'GET', 
       protocol: 'http:', 
-      hostname: '127.0.0.1', 
+      hostname: ip, 
       port: 8080,
-      path: '/localizaciones/getId/'+localizacionEdit[i]['id']    
+      path: '/apiMongo/localizaciones/getId/'+localizacionEdit[i]['id']    
     }); 
     request.on('response', (response) => {
       //cogemos la data 
@@ -414,20 +416,20 @@ ipcMain.on("editar-datos",async (e,arg, loc)=>{
   var elBodyLoc = JSON.parse(JSON.stringify(loc));
   var idR=elBodyRuta['id'];//id de la ruta
  
-  var pathRuta=`/rutas/editId/${idR}`;//path update ruta
+  var pathRuta=`/apiMongo/rutas/editId/${idR}`;//path update ruta
 
   var bodyRuta=JSON.stringify(elBodyRuta);//el body que pasamos al update de la ruta
   
   //update de las localizaciones
   for(let i=0 ; i < elBodyLoc.length; i++){
     var idL=elBodyLoc[i]['id'];
-    var pathLoc=`/localizaciones/editId/${idL}`;
+    var pathLoc=`/apiMongo/localizaciones/editId/${idL}`;
     var bodyLoc = JSON.stringify(elBodyLoc[i]);
     
     const request = await net.request({ 
       method: 'PUT', 
       protocol: 'http:', 
-      hostname: '127.0.0.1', 
+      hostname: ip, 
       port: 8080,
       path: pathLoc,
       headers: {
@@ -449,7 +451,7 @@ ipcMain.on("editar-datos",async (e,arg, loc)=>{
   const request = await net.request({ 
     method: 'PUT', 
     protocol: 'http:', 
-    hostname: '127.0.0.1', 
+    hostname: ip, 
     port: 8080,
     path: pathRuta,
     headers: {
@@ -480,17 +482,21 @@ ipcMain.on("chat",async (e)=>{
   request = await net.request({ 
     method: 'GET', 
     protocol: 'http:', 
-    hostname: '127.0.0.1', 
+    hostname: ip, 
     port: 8080,
-    path: '/rutas/getAll'
+    path: '/apiMongo/rutas/getAll'
   }); 
   request.on('response',  (response) => {
-    //cogemos la data 
-    response.on('data',async (chunk) => {
-      //console.log("DATA\n"+JSON.parse(chunk.toString('utf8')));
-      e.reply("chat",JSON.parse(chunk.toString('utf8')));
-    }
-  )}); 
+      var body = '';
+      response.on('data', function (chunk) {
+        body += chunk;
+      });
+      response.on('end', function () {
+        console.log('chat ' + JSON.parse(body));
+        e.reply("chat",JSON.parse(body));//cogemos la data 
+      });
+  
+  }); 
   request.end();
 })
 

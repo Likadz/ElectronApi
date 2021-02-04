@@ -32,9 +32,9 @@ function renderrutas(rutas) {
     rutas.map(r => {
     //si la ruta no tiene imagen definida le ponemos una basica
     if( r.imagen==null || r.imagen=="" ){
-        if(r.tematica =="comida"){
+        if(r.tematica =="Comida"){
             r.imagen="comida.jpg";
-        }else if(r.tematica=="turismo"){
+        }else if(r.tematica=="Turismo"){
             r.imagen="turismo.jpg";
         }else{
             r.imagen="misterio.jpg";
@@ -121,25 +121,27 @@ const btnChat=document.querySelector("#imgChat");
 
 var net = require('net');
 
-var usuario = "";
+var usuario = "admin";
 var ruta = "";
 //conexion 
-puerto = 1234;
+//puerto = 1234;
 //ip = '10.10.12.183'//IP Mikel
 
 //ip servidor
-//ip='13.95.106.247' 
+ip='13.95.106.247' 
 //puerto chat
-//443
+puerto=443;
 
-ip = '127.0.0.1' //local
+//ip = '127.0.0.1' //local
 var client = new net.Socket();
 
 $('#Chat').hide();
-$('.chatImg, .imgVolverChat').on("click", function(e) {
+$('.chatImg, .imgVolverChat, #imgChat').on("click", function(e) {
     $('#Chat').fadeToggle('fast');
+    $("#rutasChats").show();
+    $("#chatRuta").hide();
 });
-$('#chatRuta').hide();
+
 //click boton chat
 btnChat.addEventListener('click',e=>{
     ipcRenderer.send('chat');
@@ -176,7 +178,8 @@ function conexion(route) {
     ruta = route;
     $("#nombreRuta").html(ruta);
     var loginJson = '{ "action": "login", "user":"'+usuario+'", "route":"'+ruta+'"}';
-    
+    client.write(loginJson);
+    client.write("\n");
 }
 
 function desconexion() {
@@ -237,9 +240,9 @@ function anadirTextoExterno(json) {
         
         //cambiamos
         mensaje = json["value"];
-        usuario = json["from"];
+        usuarioL = json["from"];
 
-        content.innerHTML = usuario + ": " + mensaje;
+        content.innerHTML = usuarioL + ": " + mensaje;
     
         $('#contenidoChat').append(content);
     }

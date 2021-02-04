@@ -154,13 +154,15 @@
 }
   
 .chatExterno {
-    background-color: #5e42a6;
+    background-color: #8f81b3;
     padding: 1%;
     margin-bottom: 5px;
+    border-radius: 10px;
 } 
 
 .chatInterno {
-    background-color: chartreuse;
+    background-color: rgb(201, 248, 153);
     padding: 1%;
     margin-bottom: 5px;
+    border-radius: 10px;
 }
